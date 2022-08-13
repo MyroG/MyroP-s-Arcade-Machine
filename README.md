@@ -1,14 +1,20 @@
 # MyroP's Arcade Machine
 
-A fully working arcade machine you can add in your VRChat world.
-It is also synced for other players but not for late joiners.
+A fully working arcade machine you can add in your VRChat world, it currently features one game called HeliCave : Survive as long as possible to beat your hight score.
+The game is synced for other players, but not for late joiners.
+The machine can de scaled up and down for smaller and bigger avatars.
 
 ## Installation
 
 This asset requires :
 - The latest version of VRCSDK 3
-- UdonSharp 1.0 minimum, 1.0b is fine too, it does not work with older versions of U#
+- UdonSharp 1.0 minimum, 1.0b is fine too, it does not work with older versions of U#.
 - TextMeshPro
+
+Installation steps :
+- Get the latest release from ... and install it into your project.
+- In the folder MyroP/Arcade there's a prefab named "HeliCave", you just need to drag&drop it into your scene.
+- Done
 
 ## License
 
@@ -25,7 +31,7 @@ I implemented it this way so it's easier to apply custom shaders on the screen, 
 
 It is possible to add multiple arcade machines in the same world, but it's unfortunately not as straighforward as just copy/pasting the arcade machine.
 As mentioned above, the arcade machine uses a Render texture to render the game, and render textures are unique for each camera, since each arcade machine has a separate camera the render texture needs to be duplicated :
-- In the folder myroP/Arcade/Render Texture, duplicate a Render texture.
+- In the folder MyroP/Arcade/RenderTextures, duplicate a Render texture.
 - In the root prefab, drag&drop the render texture in the "Render texture" property field
 - You also need to set that render texture on the camera, which is in the "game" sub-prefab
 
@@ -35,7 +41,7 @@ I tried to make it more straightforward by automatically creating a Render textu
 
 ## Credits
 
-No need to credit me, but if you want to add me to the credits you can mention my VRC name (MyroP, which is different from the name on GitHub) and a link to this GitHub page.
+No need to credit me, but if you want to add me to the credits you can mention my VRC name (MyroP, which is different from the name on GitHub) with a link to this GitHub page.
 
 ## Socials & Support
 
