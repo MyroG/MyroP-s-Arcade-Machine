@@ -1,4 +1,4 @@
-# VRC-Arcade-Machine
+# MyroP's Arcade Machine
 
 A fully working arcade machine you can add in your VRChat world.
 It is also synced for other players but not for late joiners.
@@ -8,6 +8,13 @@ It is also synced for other players but not for late joiners.
 This asset requires :
 - The latest version of VRCSDK 3
 - UdonSharp 1.0 minimum, 1.0b is fine too, it does not work with older versions of U#
+- TextMeshPro
+
+## License
+
+MIT, but this prefab uses a few other external assets :
+- The font is licenced under OFL (Open font license), a copy of the license can be found in the font folder
+- The hologram shader by andydbc is licenced under the MIT license
 
 ## Some more technical informations
 
@@ -26,3 +33,14 @@ I tried to make it more straightforward by automatically creating a Render textu
 - Creating a new Render texture with `RenderTexture texture = new RenderTexture(...);` is not supported by Udon yet.
 - It's also not possible to assign a new Render Texture to a camera via script, so this line of code `Camera.targetTexture = RenderTextureToUse;`doesn't work... Not sure if that's a Udon bug or an expected behavior.
 
+## Credits
+
+No need to credit me, but if you want to add me to the credits you can mention my VRC name (MyroP, which is different from the name on GitHub) and a link to this GitHub page.
+
+## Socials & Support
+
+Feature requests and bugs reports can be submitted on this page or on one of my socials :
+- My Twitter account : https://twitter.com/MyroDev
+- My Discord group : https://discord.com/invite/kBQWu2jzcb
+
+I also have a Patreon if you're interested in donating https://www.patreon.com/myrop
