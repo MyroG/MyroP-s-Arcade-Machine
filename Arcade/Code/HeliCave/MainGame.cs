@@ -43,6 +43,7 @@ namespace MyroP.Arcade
 		public AudioClip ClipSelection;
 		public AudioSource SoundEffectSource;
 		public AudioSource SoundEffectHelicopter;
+		public AudioSource Music;
 
 		public GameObject SpawnedWallsWrapper;
 		private GameObject[] _spawnedWallsBottom;
@@ -86,6 +87,8 @@ namespace MyroP.Arcade
 		private bool _gameStarted;
 		private bool _gameCanBeStarted;
 		private float _currentUpSpeed;
+
+		private bool _inputBlocked;
 
 		void Start()
 		{
@@ -220,7 +223,7 @@ namespace MyroP.Arcade
 
 		private void SetDistanceTopAndBottomWall(float heightPercentage)
 		{
-			_currentDistanceBetweenTopAndBottomWall = 0.4f + heightPercentage * (TopBoundary.localPosition - BottomBoundary.localPosition).y / 5f;
+			_currentDistanceBetweenTopAndBottomWall = 0.5f + heightPercentage * (TopBoundary.localPosition - BottomBoundary.localPosition).y / 5f;
 		}
 
 		public override void OnDeserialization()
@@ -245,6 +248,7 @@ namespace MyroP.Arcade
 				if (_gameStateSaved != _gameState)
 				{
 					PlaySelectSound();
+					Music.gameObject.SetActive(true);
 				}
 				ShowCanvas(CanvasTimer);
 				if (_seed != _seedSaved)
@@ -255,6 +259,7 @@ namespace MyroP.Arcade
 			}
 			else if (_gameState == 3)
 			{
+				Music.gameObject.SetActive(false);
 				ShowCanvas(CanvasFinalScore);
 				FinalScoreTxt.text = ((long) _currentScore).ToString();
 				InitNextRoundValues();
@@ -269,6 +274,8 @@ namespace MyroP.Arcade
 			_timePlayed = 0;
 			_currentScore = 0;
 			_startRoundTime = 0;
+			Music.gameObject.SetActive(false);
+			_inputBlocked = false;
 		}
 
 		/// <summary>
@@ -304,6 +311,11 @@ namespace MyroP.Arcade
 
 		public void OnPress()
 		{
+			if (_inputBlocked)
+			{
+				return;
+			}
+
 			switch (_gameState)
 			{
 				case 2:
@@ -365,18 +377,10 @@ namespace MyroP.Arcade
 		{
 			if (_gameStarted)
 			{
-				//To avoid any kind of conflicts with other assets that syncs seeds for a RNG, I wanted to :
-				// - Save the current state of the RNG
-				// - Apply our state (which is _currentSeed)
-				// - Then reset the state to the previous saved value
-				//Unfortunately, Random.state is currently not exposed to Udon yet, so such kind of protection cannot be implemented yet.
-				//Since I reset the seed each time with _currentSeed, it should be fine, but it might break the syncing for other assets that
-				//sync the seed and don't reset it every time a random number is generated
-
 				//Random.State previousState = Random.state; //Uncomment once it's exposed to Udon
 				Random.InitState(_currentSeed);
 
-				float newDirection = Random.Range(-0.5f, 0.5f);
+				float newDirection = Random.Range(-0.7f, 0.7f);
 				_currentMiddleWallPosition +=  newDirection;
 
 				if (_currentMiddleWallPosition + _currentDistanceBetweenTopAndBottomWall > TopBoundary.localPosition.y || _currentMiddleWallPosition - _currentDistanceBetweenTopAndBottomWall < BottomBoundary.localPosition.y)
@@ -451,6 +455,8 @@ namespace MyroP.Arcade
 						if (_timePlayed > GameSettingsInstance.GameDuration)
 						{
 							_gameState = 3;
+							_inputBlocked = true;
+							SendCustomEventDelayedSeconds(nameof(UnlockControls), 2.0f);
 							RequestSerialization();
 							HandleOnDeserialization();
 						}
@@ -545,6 +551,11 @@ namespace MyroP.Arcade
 		{
 			SoundEffectSource.clip = ClipExplosion;
 			SoundEffectSource.Play();
+		}
+
+		public void UnlockControls()
+		{
+			_inputBlocked = false;
 		}
 	}
 }

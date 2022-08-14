@@ -14,7 +14,7 @@ namespace MyroP.Arcade
 		public string ScreenShaderEmissionPropertyName = "_EmissionMap";
 
 		[HideInInspector]
-		public int NumberWalls = 19; //currently hidden, because a different number can cause some issues
+		public int NumberWalls = 15; //currently hidden, because a different number can cause some issues
 
 		void Start()
 		{
