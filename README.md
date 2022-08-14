@@ -31,7 +31,11 @@ It is possible to add multiple arcade machines in the same world, but it's unfor
 The arcade machine uses a Render texture to render the game, and render textures are unique for each camera, since each arcade machine has a separate camera the render texture needs to be duplicated :
 - In the folder MyroP/Arcade/RenderTextures, duplicate a Render texture.
 - In the root prefab, drag&drop the render texture in the "Render texture" property field
-- You also need to set that render texture on the camera, which can be found under the "game" GameObject
+- You also need to set that render texture on the camera, which can be found under the "game" GameObject.
+
+A short video showing how to duplicate the arcade machine can be seen here :
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/BAtLaxdguMQ/0.jpg)](http://www.youtube.com/watch?v=BAtLaxdguMQ "How to duplicate the arcade machine")
 
 # License
 
