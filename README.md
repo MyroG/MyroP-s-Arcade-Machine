@@ -30,12 +30,19 @@ Unfortunately this asset doesn't include any music yet, it's really hard to find
 It is possible to add multiple arcade machines in the same world, but it's unfortunately not as straighforward as just copy/pasting the arcade machine.
 The arcade machine uses a Render texture to render the game, and render textures are unique for each camera, since each arcade machine has a separate camera the render texture needs to be duplicated :
 - In the folder MyroP/Arcade/RenderTextures, duplicate a Render texture.
-- In the root prefab, drag&drop the render texture in the "Render texture" property field
+- In the root prefab, drag&drop the render texture in the "Render texture to use" property field
 - You also need to set that render texture on the camera, which can be found under the "game" GameObject.
 
 A short video showing how to duplicate the arcade machine can be seen here :
 
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/BAtLaxdguMQ/0.jpg)](http://www.youtube.com/watch?v=BAtLaxdguMQ "How to duplicate the arcade machine")
+
+### Settings
+
+There are three settings :
+- Render texture to use : If you want to duplicate the arcade machine, make sure to set a new render texture in that field
+- Duration : How long the game should last in seconds
+- Screen shader emission property name : If you decide to use a custom shader on your screen, you can change the keyword here so that the render texture still gets applied on the material. Leave it blank if you only want the render texture to affect the main texture
 
 # License
 
