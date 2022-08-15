@@ -52,7 +52,9 @@ MIT unless explicitly marked otherwise (see `LICENSE` files), this prefab uses a
 
 # Credits and attribution
 
-No need to credit me, but if you want to add me to the credits you can mention my VRChat name (MyroP, which is different from the name on GitHub) with a link to this GitHub page.
+No need to credit me, but if you want to add me to the credits you can :
+- Mention my VRChat name (MyroP, which is different from the name on GitHub)
+- And if you want you can also add a link to this GitHub page.
 
 # Socials & Support
 
@@ -70,5 +72,7 @@ I implemented it this way so it's easier to apply custom shaders on the screen, 
 As mentioned above, it is not really easy to duplicate an arcade machine, that's because duplicating the arcade machine also requires to duplicate and use a different render texture. I tried to make it more straightforward by automatically creating a Render texture and applying it on the prefab via script, but there are two issues :
 - Creating a new Render texture with `RenderTexture texture = new RenderTexture(...);` is not supported by Udon yet.
 - It's also not possible to assign a new Render Texture to a camera via script, so this line of code `Camera.targetTexture = RenderTextureToUse;`doesn't work... Not sure if that's a Udon bug or an expected behavior.
+
+The game is placed on the "Environment" layer and the camera only picks up that layer, if you want you can change that and the game should still work correctly.
 
 Lastly, if you want to customize the game with different textures, you can perfectly do it, but be careful concerning the walls, walls are stretched so if you want to add a custom wall texture you need to account the stretch, I would recommend using a triplanar shader in those cases.
