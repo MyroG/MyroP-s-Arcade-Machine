@@ -19,7 +19,7 @@ Before importing this asset, make sure you have imported
 - TextMeshPro
 
 Installation steps :
-- Get the latest release from ... and install it into your project.
+- Get the latest release from https://github.com/MyroG/MyroP-s-Arcade-Machine/releases, download the .unitypackage file, and install it into your project.
 - In the folder MyroP/Arcade there's a prefab named "HeliCave", you just need to drag&drop it into your scene.
 - Done
 

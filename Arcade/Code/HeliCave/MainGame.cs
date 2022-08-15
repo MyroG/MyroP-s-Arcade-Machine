@@ -480,25 +480,26 @@ namespace MyroP.Arcade
 						_spawnedControllable.transform.localPosition = _positionPlayer;
 					}
 				}
-			}
+			
 
-			//Moving the walls, walls should always move even if the game didn't started (gameState != 2)
-			float direction = -Time.deltaTime;
-			int startPosition = GetIndexFirstWall();
+				//Moving the walls
+				float direction = -Time.deltaTime;
+				int startPosition = GetIndexFirstWall();
 
-			for (int i = 0; i < GameSettingsInstance.NumberWalls; i++)
-			{
-				int indexToUse = i + startPosition >= GameSettingsInstance.NumberWalls ? (i + startPosition) - GameSettingsInstance.NumberWalls : i + startPosition;
+				for (int i = 0; i < GameSettingsInstance.NumberWalls; i++)
+				{
+					int indexToUse = i + startPosition >= GameSettingsInstance.NumberWalls ? (i + startPosition) - GameSettingsInstance.NumberWalls : i + startPosition;
 				
-				GameObject objBottom = _spawnedWallsBottom[indexToUse];
-				GameObject objTop = _spawnedWallsTop[indexToUse];
+					GameObject objBottom = _spawnedWallsBottom[indexToUse];
+					GameObject objTop = _spawnedWallsTop[indexToUse];
 
-				MoveWall(objBottom, direction, false);
-				MoveWall(objTop, direction, true);
+					MoveWall(objBottom, direction, false);
+					MoveWall(objTop, direction, true);
+				}
+
+				_currentTraveledDistanceByWall += -direction;
+				MoveFirstWallToLast();
 			}
-
-			_currentTraveledDistanceByWall += -direction;
-			MoveFirstWallToLast();
 		}
 
 		private void MoveFirstWallToLast()
