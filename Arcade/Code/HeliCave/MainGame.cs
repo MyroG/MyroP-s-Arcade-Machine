@@ -110,6 +110,8 @@ namespace MyroP.Arcade
 			{
 				ScreenRenderer.material.SetTexture(GameSettingsInstance.ScreenShaderEmissionPropertyName, GameSettingsInstance.RenderTextureToUse);
 			}
+
+			gameObject.SetActive(false);
 		}
 
 		private void ShowCanvas(GameObject canvasToShow)
@@ -236,7 +238,10 @@ namespace MyroP.Arcade
 			if (_gameState == 0)
 			{
 				ResetGame();
-				PlaySelectSound();
+				if (_gameStateSaved != _gameState)
+				{
+					PlaySelectSound();
+				}
 			}
 			else if (_gameState == 1)
 			{
