@@ -190,7 +190,6 @@ namespace MyroP.Arcade
 
 			float positionY = _currentDistanceBetweenTopAndBottomWall * (shouldScaleToTop ? 1 : -1) + _currentMiddleWallPosition;
 
-			//Debug.Log(positionY);
 			wall.transform.localPosition = new Vector3(0, positionY, 0);
 
 			MoveWall(wall, positionX, shouldScaleToTop);
@@ -291,7 +290,6 @@ namespace MyroP.Arcade
 
 				if (Networking.GetServerTimeInSeconds() < _startRoundTime && _gameStateSaved != GameState.PAUSE)
 				{
-					Debug.Log("InitNextRoundValues");
 					InitNextRoundValues();
 				}
 			}
