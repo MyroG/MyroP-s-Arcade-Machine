@@ -79,9 +79,9 @@ The game is placed on the "Environment" layer and the camera only picks up that 
 
 ### The trigger
 
-For performance reasons the game (located under the "game" GameObject) is disabled by default and gets enabled once a player enters a trigger, if you want you can resize the trigger or even remove it (in that case you just need to enable the "game" GameObject because it is disabled by default)
+For performance reasons the game (located under the "game" GameObject) is disabled by default and gets enabled once a player enters a trigger, if you want you can resize the trigger.
 
 ### Customization
 
-If you want to customize the game with different textures, you can perfectly do it, but be careful concerning the walls, walls are stretched so if you want to add a custom wall texture you need to account the stretch, I would recommend using a triplanar shader in those cases.
+If you want to customize the game with different textures, you can perfectly do it, but be careful concerning the walls, walls are stretched so if you want to add a custom wall texture you need to account the stretch.
 
