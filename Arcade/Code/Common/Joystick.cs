@@ -24,7 +24,7 @@ namespace MyroP.Arcade
 
 		public override void OnPickup()
 		{
-			MainGameInstance.LocalPlayerBecomesOwner();
+			MainGameInstance.PlayerPickedUpJoystick();
 			SendCustomNetworkEvent(NetworkEventTarget.All, nameof(OnPickupEvent));
 		}
 
@@ -35,7 +35,7 @@ namespace MyroP.Arcade
 
 		public override void OnDrop()
 		{
-			MainGameInstance.PrepareResetGame();
+			MainGameInstance.PlayerDroppedJoystick();
 			SendCustomNetworkEvent(NetworkEventTarget.All, nameof(OnDropEvent));
 			_objectSync.Respawn();
 		}

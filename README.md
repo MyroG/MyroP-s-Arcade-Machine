@@ -66,6 +66,8 @@ I also have a Patreon if you're interested in donating https://www.patreon.com/m
 
 # Some more technical informations
 
+### The camera
+
 The game itself is actually filmed by a camera inside the arcade machine, which outputs it on a render texture, the render texture is then applied on the screen.
 I implemented it this way so it's easier to apply custom shaders on the screen, like a CRT screen shader! Those kind of shaders are not included in the package but can be downloaded elsewhere.
 
@@ -75,4 +77,11 @@ As mentioned above, it is not really easy to duplicate an arcade machine, that's
 
 The game is placed on the "Environment" layer and the camera only picks up that layer, if you want you can change that and the game should still work correctly.
 
-Lastly, if you want to customize the game with different textures, you can perfectly do it, but be careful concerning the walls, walls are stretched so if you want to add a custom wall texture you need to account the stretch, I would recommend using a triplanar shader in those cases.
+### The trigger
+
+For performance reasons the game (located under the "game" GameObject) is disabled by default and gets enabled once a player enters a trigger, if you want you can resize the trigger or even remove it (in that case you just need to enable the "game" GameObject because it is disabled by default)
+
+### Customization
+
+If you want to customize the game with different textures, you can perfectly do it, but be careful concerning the walls, walls are stretched so if you want to add a custom wall texture you need to account the stretch, I would recommend using a triplanar shader in those cases.
+

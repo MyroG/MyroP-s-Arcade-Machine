@@ -7,8 +7,19 @@ using VRC.Udon;
 
 namespace MyroP.Arcade
 {
+	public enum GameState
+	{
+		START_SCREEN,
+		EXPLANATIONS,
+		PLAY,
+		PAUSE,
+		FINISH
+	}
+
 	public class MainGame : UdonSharpBehaviour
 	{
+		
+
 		public GameSettings GameSettingsInstance;
 		public Camera CameraLookingAtGame;
 		public MeshRenderer ScreenRenderer;
@@ -26,6 +37,7 @@ namespace MyroP.Arcade
 		public GameObject CanvasExplanation;
 		public GameObject CanvasTimer;
 		public GameObject CanvasFinalScore;
+		public GameObject CanvasPauseScreen;
 
 		//Prefabs that get spawned
 		public GameObject PrefabWall;
@@ -50,9 +62,10 @@ namespace MyroP.Arcade
 		private GameObject[] _spawnedWallsTop;
 		private GameObject _spawnedControllable;
 
+
 		[UdonSynced]
-		private int _gameState;
-		private int _gameStateSaved;
+		private GameState _gameState;
+		private GameState _gameStateSaved;
 		[UdonSynced]
 		private int _seed;
 		private int _seedSaved;
@@ -62,12 +75,11 @@ namespace MyroP.Arcade
 		private double _startGameTime;
 		[UdonSynced]
 		private double _startRoundTime;
-
 		[UdonSynced]
 		private Vector3 _positionPlayer;
-
 		[UdonSynced]
 		private float _currentScore;
+		private bool _gameStarted;
 
 		private double _timePlayed;
 
@@ -84,7 +96,7 @@ namespace MyroP.Arcade
 
 
 		private bool _buttonPressed;
-		private bool _gameStarted;
+		
 		private bool _gameCanBeStarted;
 		private float _currentUpSpeed;
 
@@ -120,6 +132,7 @@ namespace MyroP.Arcade
 			CanvasExplanation.SetActive(false);
 			CanvasTimer.SetActive(false);
 			CanvasFinalScore.SetActive(false);
+			CanvasPauseScreen.SetActive(false);
 
 			if (canvasToShow != null)
 			{
@@ -147,9 +160,20 @@ namespace MyroP.Arcade
 			}
 		}
 
-		public void LocalPlayerBecomesOwner()
+		public void PlayerPickedUpJoystick()
 		{
-			Networking.SetOwner(Networking.LocalPlayer, gameObject);
+			if (_gameState == GameState.PAUSE && IsLocalPlayerPlaying())
+			{
+				_gameState = GameState.PLAY;
+				SetNewRoundTimer();
+				RequestSerialization();
+				HandleOnDeserialization();
+			}
+			else
+			{
+				Networking.SetOwner(Networking.LocalPlayer, gameObject);
+				PrepareResetGame();
+			}
 		}
 
 		private void SpawnPawn()
@@ -165,6 +189,8 @@ namespace MyroP.Arcade
 				return;
 
 			float positionY = _currentDistanceBetweenTopAndBottomWall * (shouldScaleToTop ? 1 : -1) + _currentMiddleWallPosition;
+
+			//Debug.Log(positionY);
 			wall.transform.localPosition = new Vector3(0, positionY, 0);
 
 			MoveWall(wall, positionX, shouldScaleToTop);
@@ -235,7 +261,7 @@ namespace MyroP.Arcade
 
 		private void HandleOnDeserialization()
 		{
-			if (_gameState == 0)
+			if (_gameState == GameState.START_SCREEN)
 			{
 				ResetGame();
 				if (_gameStateSaved != _gameState)
@@ -243,28 +269,43 @@ namespace MyroP.Arcade
 					PlaySelectSound();
 				}
 			}
-			else if (_gameState == 1)
+			else if (_gameState == GameState.EXPLANATIONS)
 			{
 				ShowCanvas(CanvasExplanation);
 				PlaySelectSound();
 			}
-			else if (_gameState == 2)
+			else if (_gameState == GameState.PLAY)
 			{
 				if (_gameStateSaved != _gameState)
 				{
 					PlaySelectSound();
-					Music.gameObject.SetActive(true);
+					PlayMusic(true);
+					ShowCanvas(CanvasTimer);
 				}
-				ShowCanvas(CanvasTimer);
+
 				if (_seed != _seedSaved)
 				{
 					_currentSeed = _seed;
 					_seedSaved = _seed;
 				}
+
+				if (Networking.GetServerTimeInSeconds() < _startRoundTime && _gameStateSaved != GameState.PAUSE)
+				{
+					Debug.Log("InitNextRoundValues");
+					InitNextRoundValues();
+				}
 			}
-			else if (_gameState == 3)
+			else if (_gameState == GameState.PAUSE && _gameStateSaved != _gameState)
 			{
-				Music.gameObject.SetActive(false);
+				ShowCanvas(CanvasPauseScreen);
+				PlaySelectSound();
+				PlayMusic(false);
+				SoundEffectHelicopter.gameObject.SetActive(false);
+				_gameStarted = false;
+			}
+			else if (_gameState == GameState.FINISH)
+			{
+				PlayMusic(false);
 				ShowCanvas(CanvasFinalScore);
 				FinalScoreTxt.text = ((long) _currentScore).ToString();
 				InitNextRoundValues();
@@ -272,6 +313,13 @@ namespace MyroP.Arcade
 			_gameStateSaved = _gameState;
 		}
 
+		public void ResetIfOwner()
+		{
+			if (IsLocalPlayerPlaying())
+			{
+				PrepareResetGame();
+			}
+		}
 		private void ResetGame()
 		{
 			InitNextRoundValues();
@@ -309,6 +357,20 @@ namespace MyroP.Arcade
 			HandleOnDeserialization();
 		}
 
+		public void PlayerDroppedJoystick()
+		{
+			if (_gameState == GameState.PLAY)
+			{
+				_gameState = GameState.PAUSE;
+			}
+			else
+			{
+				PrepareResetGame();
+			}
+			RequestSerialization();
+			HandleOnDeserialization();
+		}
+
 		private int GetNextSeed()
 		{
 			return Random.Range((int)0, (int)0xFFFFFF);
@@ -323,23 +385,30 @@ namespace MyroP.Arcade
 
 			switch (_gameState)
 			{
-				case 2:
+				case GameState.PLAY:
 				{
 					_buttonPressed = true;
 					break;
 				}
 				default:
 				{
-					_gameState++;
-					if (_gameState == 2)
+					if (_gameState == GameState.START_SCREEN)
+					{
+						_gameState = GameState.EXPLANATIONS;
+					}
+					else if (_gameState == GameState.EXPLANATIONS)
+					{
+						_gameState = GameState.PLAY;
+					}
+
+					if (_gameState == GameState.PLAY)
 					{
 						InitNewRound();
-						SyncPlayer();
 						_startGameTime = _startRoundTime;
 					}
-					else if (_gameState >= 3)
+					else if (_gameState == GameState.FINISH)
 					{
-						_gameState = 0;
+						_gameState = GameState.START_SCREEN;
 					}
 					RequestSerialization();
 					HandleOnDeserialization();
@@ -350,7 +419,7 @@ namespace MyroP.Arcade
 
 		public void SyncPlayer()
 		{
-			if (_gameState == 2)
+			if (_gameState == GameState.PLAY && _gameStarted)
 			{
 				_positionPlayer = _spawnedControllable.transform.localPosition;
 				RequestSerialization();
@@ -359,13 +428,18 @@ namespace MyroP.Arcade
 		}
 		private void InitNewRound()
 		{
-			_startRoundTime = Networking.GetServerTimeInSeconds() + 4.0f;
+			SetNewRoundTimer();
 			while (_seed == _seedSaved)
 			{
 				_seed = GetNextSeed();
 			}
 			RequestSerialization();
 			HandleOnDeserialization();
+		}
+
+		private void SetNewRoundTimer()
+		{
+			_startRoundTime = Networking.GetServerTimeInSeconds() + 4.0f;
 		}
 
 		public void OnRelease()
@@ -401,12 +475,11 @@ namespace MyroP.Arcade
 		private bool IsLocalPlayerPlaying()
 		{
 			return Networking.IsOwner(gameObject);
-
 		}
 
 		private void UpdateIngameUI()
 		{
-			if (_gameState == 2)
+			if (_gameState == GameState.PLAY)
 			{
 				if (!_gameStarted)
 				{
@@ -431,80 +504,82 @@ namespace MyroP.Arcade
 
 		private void Update()
 		{
-			if (_gameState == 2)
+			if (_gameState != GameState.PLAY)
 			{
-				UpdateIngameUI();
-
-				//Displaying the timer if the game didn't started yet
-				if (Networking.GetServerTimeInSeconds() <= _startRoundTime && _gameStarted)
-				{
-					InitNextRoundValues();
-				}
-				if (!_gameStarted && Networking.GetServerTimeInSeconds() > _startRoundTime)
-				{
-					_gameStarted = true;
-					SoundEffectHelicopter.gameObject.SetActive(true);
-				}
-
-				if (_gameStarted)
-				{
-					//calculating score, progress and broadness of the cave
-					_timePlayed += Time.deltaTime;
-					SetDistanceTopAndBottomWall(1.0f - (float)(Networking.GetServerTimeInSeconds() - _startRoundTime) / GameSettingsInstance.GameDuration);
-
-					if (IsLocalPlayerPlaying())
-					{
-						_currentScore += (float)(Networking.GetServerTimeInMilliseconds() / 1000.0f - _startRoundTime);
-
-						//Check if the game is finished
-						if (_timePlayed > GameSettingsInstance.GameDuration)
-						{
-							_gameState = 3;
-							_inputBlocked = true;
-							SendCustomEventDelayedSeconds(nameof(UnlockControls), 2.0f);
-							RequestSerialization();
-							HandleOnDeserialization();
-						}
-						//Applying forces to the helicopter
-						_spawnedControllable.transform.localPosition += new Vector3(0, _currentUpSpeed, 0);
-						if (_buttonPressed)
-						{
-							_currentUpSpeed += Time.deltaTime / 16.0f;
-						}
-						else
-						{
-							_currentUpSpeed -= Time.deltaTime / 16.0f;
-						}
-
-
-						SoundEffectHelicopter.pitch = Mathf.Clamp((_currentUpSpeed + 1) + _currentUpSpeed * 20, 0.2f, 1.8f);
-
-					}
-					else
-					{
-						_spawnedControllable.transform.localPosition = _positionPlayer;
-					}
-				}
-			
-
-				//Moving the walls
-				float direction = -Time.deltaTime;
-				int startPosition = GetIndexFirstWall();
-
-				for (int i = 0; i < GameSettingsInstance.NumberWalls; i++)
-				{
-					int indexToUse = i + startPosition >= GameSettingsInstance.NumberWalls ? (i + startPosition) - GameSettingsInstance.NumberWalls : i + startPosition;
-				
-					GameObject objBottom = _spawnedWallsBottom[indexToUse];
-					GameObject objTop = _spawnedWallsTop[indexToUse];
-
-					MoveWall(objBottom, direction, false);
-					MoveWall(objTop, direction, true);
-				}
-
-				_currentTraveledDistanceByWall += -direction;
-				MoveFirstWallToLast();
+				return;
 			}
+
+			UpdateIngameUI();
+
+			if (!_gameStarted && Networking.GetServerTimeInSeconds() > _startRoundTime)
+			{
+				_gameStarted = true;
+				if (IsLocalPlayerPlaying())
+				{
+					SyncPlayer();
+				}
+				SoundEffectHelicopter.gameObject.SetActive(true);
+			}
+
+			if (!_gameStarted)
+			{
+				return;
+			}
+
+			//calculating score, progress and broadness of the cave
+			_timePlayed += Time.deltaTime;
+			SetDistanceTopAndBottomWall(1.0f - (float)(Networking.GetServerTimeInSeconds() - _startRoundTime) / GameSettingsInstance.GameDuration);
+
+			if (IsLocalPlayerPlaying())
+			{
+				_currentScore += (float)(Networking.GetServerTimeInMilliseconds() / 1000.0f - _startRoundTime);
+
+				//Check if the game is finished
+				if (_timePlayed > GameSettingsInstance.GameDuration)
+				{
+					_gameState = GameState.FINISH;
+					_inputBlocked = true;
+					SendCustomEventDelayedSeconds(nameof(UnlockControls), 2.0f);
+					RequestSerialization();
+					HandleOnDeserialization();
+				}
+				//Applying forces to the helicopter
+				_spawnedControllable.transform.localPosition += new Vector3(0, _currentUpSpeed, 0);
+				if (_buttonPressed)
+				{
+					_currentUpSpeed += Time.deltaTime / 16.0f;
+				}
+				else
+				{
+					_currentUpSpeed -= Time.deltaTime / 16.0f;
+				}
+
+
+				SoundEffectHelicopter.pitch = Mathf.Clamp((_currentUpSpeed + 1) + _currentUpSpeed * 20, 0.2f, 1.8f);
+
+			}
+			else
+			{
+				_spawnedControllable.transform.localPosition = _positionPlayer;
+			}
+				
+			//Moving the walls
+			float direction = -Time.deltaTime;
+			int startPosition = GetIndexFirstWall();
+
+			for (int i = 0; i < GameSettingsInstance.NumberWalls; i++)
+			{
+				int indexToUse = i + startPosition >= GameSettingsInstance.NumberWalls ? (i + startPosition) - GameSettingsInstance.NumberWalls : i + startPosition;
+				
+				GameObject objBottom = _spawnedWallsBottom[indexToUse];
+				GameObject objTop = _spawnedWallsTop[indexToUse];
+
+				MoveWall(objBottom, direction, false);
+				MoveWall(objTop, direction, true);
+			}
+
+			_currentTraveledDistanceByWall += -direction;
+			MoveFirstWallToLast();
 		}
 
 		private void MoveFirstWallToLast()
@@ -551,6 +626,11 @@ namespace MyroP.Arcade
 		{
 			SoundEffectSource.clip = ClipSelection;
 			SoundEffectSource.Play();
+		}
+
+		public void PlayMusic(bool shouldPlayMusic)
+		{
+			Music.gameObject.SetActive(shouldPlayMusic);
 		}
 
 		public void PlayExplosionSound()
