@@ -1,11 +1,11 @@
 # MyroP's Arcade Machine
 
 A fully working arcade machine you can add in your VRChat world.
-It currently features one game called HeliCave : Survive as long as possible for a certain amount of time, the hight score is then calculated based on the number of death and the amount of time you survived.
+It currently features one game called HeliCave : Survive as long as possible for a certain amount of time, the hight score is then calculated based on the number of deaths and the amount of time you survived.
 The game is synced for other players, but not for late joiners.
 The machine can be scaled up and down for smaller and bigger avatars.
 
-It can be tested here : https://vrchat.com/home/world/wrld_22e9b1a3-1d2e-4800-b46d-ce3501b07001
+The latest version of the arcade machine can be tested here : https://vrchat.com/home/world/wrld_22e9b1a3-1d2e-4800-b46d-ce3501b07001
 
 A short gameplay video can be seen here
 
@@ -84,4 +84,9 @@ For performance reasons the game (located under the "game" GameObject) is disabl
 ### Customization
 
 If you want to customize the game with different textures, you can perfectly do it, but be careful concerning the walls, walls are stretched so if you want to add a custom wall texture you need to account the stretch.
+
+It is also possible to display the game on a different asset, like a TV screen (not included), to do so you need to :
+- Place the "game" game object at a spot that is not too easy to notice, for instance behind a wall
+- Attach the "Joystick" script on a game object that can be used as a controller, the controller also needs "VCCPickup" and "VRCObjectSync", the "Joystick" script needs a reference to the "MainGame" script which is located in the "game" game object.
+- Apply the render texture on your TV screen.
 
