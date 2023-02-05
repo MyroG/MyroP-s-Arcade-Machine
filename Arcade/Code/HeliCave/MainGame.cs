@@ -116,7 +116,7 @@ namespace MyroP.Arcade
 			CameraLookingAtGame.farClipPlane *= scale;
 
 			//Now we need to set the renderTexture on the camera, and on the screen material
-			//CameraLookingAtGame.targetTexture = GameSettingsInstance.RenderTextureToUse; //This is currently broken on Udon
+			CameraLookingAtGame.targetTexture = GameSettingsInstance.RenderTextureToUse;
 			ScreenRenderer.material.mainTexture = GameSettingsInstance.RenderTextureToUse;
 			if (!System.String.IsNullOrEmpty(GameSettingsInstance.ScreenShaderEmissionPropertyName))
 			{

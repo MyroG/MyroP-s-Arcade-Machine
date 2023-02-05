@@ -177,7 +177,7 @@ GameObject:
   - component: {fileID: 1642404940338608550}
   - component: {fileID: 2226438290163808538}
   m_Layer: 0
-  m_Name: button
+  m_Name: resetButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -190,13 +190,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4747968524577107220}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.7, y: 1.197, z: -0.137}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: 0.70710576, w: 0.7071079}
+  m_LocalPosition: {x: -0.8569, y: 1.0844, z: -0.1379}
+  m_LocalScale: {x: 1.1820312, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4518077381719757521}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90.00001}
 --- !u!65 &1055853371471410689
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -247,7 +247,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactTextPlacement: {fileID: 0}
-  interactText: Use
+  interactText: Reset game
   interactTextGO: {fileID: 0}
   proximity: 2
   SynchronizePosition: 0
@@ -838,7 +838,7 @@ PrefabInstance:
     - target: {fileID: 5196654080349001557, guid: d4958e4284fca404fb2359a768d55ba5,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5320957135903458213, guid: d4958e4284fca404fb2359a768d55ba5,
         type: 3}
