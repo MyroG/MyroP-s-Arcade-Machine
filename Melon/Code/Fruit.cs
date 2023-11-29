@@ -16,28 +16,58 @@ namespace myro.arcade
 
 		private MelonGameLoop _melonGameLoopInstance;
 
-		private float	_targetScale;
-		private float	_currentScale;
+		private const float	TARGET_COLLIDER_RADIUS = 0.5f;
+		private float	_currentColliderRadius;
 		private float	_gravityMultiplicator;
 		private bool	_hadCollision;
 
-		public void Construct(Transform parent, Vector3 localPosition, MelonGameLoop melonGameLoopInstance, int rank, float gameScale, bool isFused)
+		#region Game Over Detection
+		private float _yAxisLimit; //If one fruit stays above that limit for more than a second, the game is lost
+		private float _startTimeAboveLimit;
+
+		private void CheckGameOver()
+		{
+			if (!_hadCollision)
+			{
+				return;
+			}
+
+			if (transform.localPosition.y < _yAxisLimit)
+			{
+				_startTimeAboveLimit = 0;
+			}
+			else if (_startTimeAboveLimit == 0)
+			{
+				_startTimeAboveLimit = Time.time;
+			}
+			else if (Time.time - _startTimeAboveLimit > 1.0f)
+			{
+				_melonGameLoopInstance.GameOver();
+			}
+		}
+#endregion
+		public void Construct(Transform parent, Vector3 localPosition, MelonGameLoop melonGameLoopInstance, int rank, float gameScale, float yAxisLimit, bool isFused)
 		{
 			transform.parent = parent;
 			transform.localPosition = localPosition;
 			FruitCollider.enabled = false;
 			RigidbodyInstance.isKinematic = true;
+			
 			_rank = rank;
 			_hadCollision = isFused;
+			_yAxisLimit = yAxisLimit;
 
 			//In the original game, a cherry is 22 wide, and a melon 184px, the box is 315px wide
 			float fruitScale = 0.22f + rank * 0.147272f;
-			_currentScale = fruitScale;
-			_targetScale = fruitScale;
+			transform.localScale = new Vector3(fruitScale, fruitScale, fruitScale / 1.5f);
+
+			_currentColliderRadius = TARGET_COLLIDER_RADIUS;
 			MeshRendererInstance.material.SetTextureOffset("_MainTex", new Vector2((rank % 4) / 4.0f, (rank / 4) / 4.0f));;
 			_gravityMultiplicator = gameScale;
 			_melonGameLoopInstance = melonGameLoopInstance;
-
+			RigidbodyInstance.mass = fruitScale * fruitScale * 3.1415926f;
+			RigidbodyInstance.drag = 0;
+			RigidbodyInstance.angularDrag = 1f;
 
 			SetScaleAndRotation();
 		}
@@ -49,7 +79,7 @@ namespace myro.arcade
 
 		private void SetScaleAndRotation()
 		{
-			transform.localScale = new Vector3(_currentScale, _currentScale, _targetScale / 1.5f);
+			FruitCollider.radius = _currentColliderRadius;
 			transform.localEulerAngles = new Vector3(0, 0, transform.localEulerAngles.z);
 		}
 
@@ -59,7 +89,7 @@ namespace myro.arcade
 			RigidbodyInstance.isKinematic = false;
 			RigidbodyInstance.collisionDetectionMode = CollisionDetectionMode.Continuous;
 			FruitCollider.contactOffset = 0.0001f;
-			_currentScale = _targetScale * 0.5f;
+			_currentColliderRadius = TARGET_COLLIDER_RADIUS * 0.66f;
 			SetScaleAndRotation();
 		}
 
@@ -71,16 +101,13 @@ namespace myro.arcade
 			RigidbodyInstance.velocity = transform.parent.TransformDirection(localVelocity);
 
 			//Gravity on the local space
-			RigidbodyInstance.AddForce(transform.parent.up.normalized * -9.8f * _gravityMultiplicator);
+			RigidbodyInstance.AddForce(transform.parent.up.normalized * -5f * _gravityMultiplicator * RigidbodyInstance.mass);
 		}
 
 		private void Update()
 		{
-			_currentScale += Time.deltaTime;
-			if (_currentScale > _targetScale)
-			{
-				_currentScale = _targetScale;
-			}
+			CheckGameOver();
+			_currentColliderRadius += (TARGET_COLLIDER_RADIUS - _currentColliderRadius) * Time.deltaTime * 2.5f;
 
 			//Local rotation contraint
 			SetScaleAndRotation();
@@ -96,7 +123,7 @@ namespace myro.arcade
 				_melonGameLoopInstance.ReadyForNextFruit();
 				_hadCollision = true;
 			}
-			if (gameObject.activeSelf)
+			if (gameObject.activeSelf && _rank != 10)
 			{
 				Fruit anotherFruit = collision.gameObject.GetComponent<Fruit>();
 				if (anotherFruit != null && _rank == anotherFruit.GetRank() && collision.gameObject.activeSelf)

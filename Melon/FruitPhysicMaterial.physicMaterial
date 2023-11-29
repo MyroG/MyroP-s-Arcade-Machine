@@ -6,9 +6,9 @@ PhysicMaterial:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: New Physic Material
-  dynamicFriction: 0.1
-  staticFriction: 0.1
-  bounciness: 0.2
+  m_Name: FruitPhysicMaterial
+  dynamicFriction: 0.5
+  staticFriction: 0.5
+  bounciness: 0
   frictionCombine: 0
   bounceCombine: 0

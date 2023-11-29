@@ -1,4 +1,5 @@
 ﻿
+using TMPro;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDK3.Data;
@@ -7,6 +8,7 @@ using VRC.Udon;
 
 namespace myro.arcade
 {
+	[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 	public class MelonGameLoop : UdonSharpBehaviour
 	{
 		public Transform LeftWall;
@@ -15,9 +17,21 @@ namespace myro.arcade
 		public Joystick JoystickInstance;
 
 		public Transform DropTransform;
+		public Transform DeathZone;
 		public GameObject FruitPrefab;
+
+		public TextMeshProUGUI Score;
+		public TextMeshProUGUI Scoreboard;
+
 		private Fruit _currentFruit;
 		private DataList _instantiatedFruits;
+
+		[UdonSynced]
+		private GameState _gameState;
+
+		[UdonSynced]
+		private int _score;
+
 		void Start()
 		{
 			_instantiatedFruits = new DataList();
@@ -32,7 +46,8 @@ namespace myro.arcade
 
 		public void NewFruit()
 		{
-			_currentFruit = InstantiateNewFruitAt(GetCursorPosition(), Random.Range(0,5), false);
+			int rank = Random.Range(0, 5);
+			_currentFruit = InstantiateNewFruitAt(GetCursorPosition(), rank, false);
 		}
 
 		public void OnPress()
@@ -46,17 +61,41 @@ namespace myro.arcade
 
 		private void StartGame()
 		{
+			_score = 0;
+			_gameState = GameState.PLAY;
 			NewFruit();
 		}
 
-		
+		public void AddToScore(int points)
+		{
+			_score += points;
+			UpdateUI();
+		}
+
+		//Called from the Scoreboard script
+		public void RequestScoreboardUpdate()
+		{
+
+		}
+
+		private void UpdateUI()
+		{
+			Score.text = _score.ToString();
+		}
+
+		public void GameOver()
+		{
+			Destroy(_currentFruit.gameObject);
+			_currentFruit = null;
+		}
 
 		internal Fruit InstantiateNewFruitAt(Vector3 localPosition, int rank, bool isFused)
 		{
 			Fruit newFruit = Instantiate(FruitPrefab).GetComponent<Fruit>();
-			newFruit.Construct(transform, localPosition, this, rank, transform.lossyScale.x, isFused);
-			newFruit.transform.localPosition = localPosition;
+			newFruit.Construct(transform, localPosition, this, rank, transform.lossyScale.x, DeathZone.localPosition.y, isFused);
 			_instantiatedFruits.Add(newFruit);
+
+			AddToScore(rank << 1);
 			return newFruit;
 		}
 

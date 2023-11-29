@@ -6,9 +6,10 @@ using VRC.Udon;
 
 namespace myro.arcade
 {
+	[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 	public class Trigger : UdonSharpBehaviour
 	{
-		public MainGame MainGameInstance;
+		public GameObject MainGameInstance;
 		public Joystick JoystickInstance;
 		void Start()
 		{
@@ -19,7 +20,7 @@ namespace myro.arcade
 		{
 			if (player.isLocal)
 			{
-				MainGameInstance.gameObject.SetActive(true);
+				MainGameInstance.SetActive(true);
 			}
 		}
 
@@ -27,7 +28,7 @@ namespace myro.arcade
 		{
 			if (player.isLocal)
 			{
-				MainGameInstance.gameObject.SetActive(false);
+				MainGameInstance.SetActive(false);
 				JoystickInstance.ForceDrop();
 			}
 		}

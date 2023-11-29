@@ -20,9 +20,7 @@ namespace myro.arcade
 	{
 		
 
-		public GameSettings GameSettingsInstance;
-		public Camera CameraLookingAtGame;
-		public MeshRenderer ScreenRenderer;
+		public HeliCaveGameSettings GameSettingsInstance;
 
 		//Basically the boundaries of the game, used to determine where stuff needs to be spawned
 		public Transform TopBoundary;
@@ -107,21 +105,6 @@ namespace myro.arcade
 			SpawnWalls();
 			SpawnPawn();
 			ResetGame();
-
-			//If the arcade got scaled down, we need to make sure that the camera still fits
-			//not gonna check if the arcade machine got unevenly scaled, because...meh, probably pointless
-			float scale = GameSettingsInstance.transform.lossyScale.x; //GameSettingsInstance is attached at the root
-			CameraLookingAtGame.orthographicSize *= scale;
-			CameraLookingAtGame.nearClipPlane *= scale;
-			CameraLookingAtGame.farClipPlane *= scale;
-
-			//Now we need to set the renderTexture on the camera, and on the screen material
-			CameraLookingAtGame.targetTexture = GameSettingsInstance.RenderTextureToUse;
-			ScreenRenderer.material.mainTexture = GameSettingsInstance.RenderTextureToUse;
-			if (!System.String.IsNullOrEmpty(GameSettingsInstance.ScreenShaderEmissionPropertyName))
-			{
-				ScreenRenderer.material.SetTexture(GameSettingsInstance.ScreenShaderEmissionPropertyName, GameSettingsInstance.RenderTextureToUse);
-			}
 
 			gameObject.SetActive(false);
 		}

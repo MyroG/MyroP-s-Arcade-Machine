@@ -58,8 +58,8 @@ Rigidbody:
   m_GameObject: {fileID: 442005322883663023}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_Drag: 1
+  m_AngularDrag: 1
   m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
@@ -141,13 +141,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6120345212965546057}
-  m_LocalRotation: {x: -0.70710677, y: -0, z: -0, w: 0.7071068}
+  m_LocalRotation: {x: 0.00000023456188, y: 0.7071068, z: -0.7071068, w: -0.0000002437169}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 0, z: 1}
+  m_LocalScale: {x: 1.05, y: 0, z: 1.05}
   m_Children: []
   m_Father: {fileID: 3868761921490444630}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -90.00001, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -270, y: -180, z: 0}
 --- !u!33 &794121187827591306
 MeshFilter:
   m_ObjectHideFlags: 0
