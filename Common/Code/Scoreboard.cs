@@ -21,14 +21,19 @@ namespace myro.arcade
 			_connectedScoreboards = new DataList();
 		}
 
-		public void Insert(UdonSharpBehaviour usharpBehaviour, VRCPlayerApi player, double score)
+		public void RegisterBehaviour(UdonSharpBehaviour usharpBehaviour)
 		{
-			_scoreboard[player.displayName] = score;
-
 			if (_connectedScoreboards.IndexOf(usharpBehaviour) == -1)
 			{
 				_connectedScoreboards.Add(usharpBehaviour);
 			}
+		}
+
+		public void Insert(VRCPlayerApi player, double score)
+		{
+			_scoreboard[player.displayName] = score;
+
+			
 			SerializeJSON();
 		}
 

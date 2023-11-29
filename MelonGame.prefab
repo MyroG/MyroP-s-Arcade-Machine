@@ -896,6 +896,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8856973310330056112, guid: 6ecb7fd477a06184b9b86b87a39135c3,
         type: 3}
+    - target: {fileID: 8856973310330056112, guid: 6ecb7fd477a06184b9b86b87a39135c3,
+        type: 3}
+      propertyPath: MelonGameSettingsInstance
+      value: 
+      objectReference: {fileID: 8878259032881581398}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6ecb7fd477a06184b9b86b87a39135c3, type: 3}
 --- !u!4 &5792409085835086072 stripped

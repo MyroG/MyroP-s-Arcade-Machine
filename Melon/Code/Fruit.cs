@@ -31,8 +31,7 @@ namespace myro.arcade
 			{
 				return;
 			}
-
-			if (transform.localPosition.y < _yAxisLimit)
+			if (transform.localPosition.y - transform.localScale.x / 2.0f  < _yAxisLimit)
 			{
 				_startTimeAboveLimit = 0;
 			}
@@ -59,10 +58,10 @@ namespace myro.arcade
 
 			//In the original game, a cherry is 22 wide, and a melon 184px, the box is 315px wide
 			float fruitScale = 0.22f + rank * 0.147272f;
-			transform.localScale = new Vector3(fruitScale, fruitScale, fruitScale / 1.5f);
+			transform.localScale = new Vector3(fruitScale, fruitScale, fruitScale);
 
 			_currentColliderRadius = TARGET_COLLIDER_RADIUS;
-			MeshRendererInstance.material.SetTextureOffset("_MainTex", new Vector2((rank % 4) / 4.0f, (rank / 4) / 4.0f));;
+			MeshRendererInstance.material.SetTextureOffset("_MainTex", new Vector2((rank % 4) / 4.0f, (rank / 4) / 4.0f));
 			_gravityMultiplicator = gameScale;
 			_melonGameLoopInstance = melonGameLoopInstance;
 			RigidbodyInstance.mass = fruitScale * fruitScale * 3.1415926f;

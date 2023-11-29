@@ -19,7 +19,9 @@ namespace myro.arcade
 		public Transform DropTransform;
 		public Transform DeathZone;
 		public GameObject FruitPrefab;
-
+		public GameObject ScoreboardWrapper;
+		public GameObject GameOverMessage;
+		public MelonGameSettings MelonGameSettingsInstance;
 		public TextMeshProUGUI Score;
 		public TextMeshProUGUI Scoreboard;
 
@@ -34,14 +36,23 @@ namespace myro.arcade
 
 		void Start()
 		{
-			_instantiatedFruits = new DataList();
+			ScoreboardWrapper.SetActive(MelonGameSettingsInstance.ScoreboardInstance);
+			if (MelonGameSettingsInstance.ScoreboardInstance)
+			{
+				MelonGameSettingsInstance.ScoreboardInstance.RegisterBehaviour(this);
+			}
 			StartGame();
 		}
 
 		private Vector3 GetCursorPosition()
 		{
 			float ratioX = JoystickInstance.GetPositionXRatio();
-			return Vector3.Lerp(LeftWall.localPosition, RightWall.localPosition, ratioX);
+			float radiusFruit = 0;
+			if (_currentFruit)
+				radiusFruit = _currentFruit.transform.localScale.x / 2.0f + 0.02f; //We add a little threshold at the end
+			Vector3 left = new Vector3(LeftWall.localPosition.x + radiusFruit, LeftWall.localPosition.y, LeftWall.localPosition.z);
+			Vector3 right = new Vector3(RightWall.localPosition.x - radiusFruit, RightWall.localPosition.y, RightWall.localPosition.z);
+			return Vector3.Lerp(left, right, ratioX);
 		}
 
 		public void NewFruit()
@@ -52,15 +63,34 @@ namespace myro.arcade
 
 		public void OnPress()
 		{
-			if (_currentFruit != null)
+			if (_gameState == GameState.PLAY)
 			{
-				_currentFruit.DropFruit();
-				_currentFruit = null;
+				if (_currentFruit != null)
+				{
+					_currentFruit.DropFruit();
+					_currentFruit = null;
+				}
+			}
+			else
+			{
+				StartGame();
 			}
 		}
 
 		private void StartGame()
 		{
+			if (_instantiatedFruits != null)
+			{
+				for (int i = 0; i < _instantiatedFruits.Count; i++)
+				{
+					Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
+					if (fruit)
+						Destroy(fruit.gameObject);
+				}
+			}
+			_instantiatedFruits = new DataList();
+
+			GameOverMessage.SetActive(false);
 			_score = 0;
 			_gameState = GameState.PLAY;
 			NewFruit();
@@ -87,6 +117,15 @@ namespace myro.arcade
 		{
 			Destroy(_currentFruit.gameObject);
 			_currentFruit = null;
+			GameOverMessage.SetActive(true);
+			_gameState = GameState.FINISH;
+
+			for (int i = 0; i < _instantiatedFruits.Count; i++)
+			{
+				Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
+				if (fruit)
+					fruit.RigidbodyInstance.isKinematic = true;
+			}
 		}
 
 		internal Fruit InstantiateNewFruitAt(Vector3 localPosition, int rank, bool isFused)
@@ -95,7 +134,7 @@ namespace myro.arcade
 			newFruit.Construct(transform, localPosition, this, rank, transform.lossyScale.x, DeathZone.localPosition.y, isFused);
 			_instantiatedFruits.Add(newFruit);
 
-			AddToScore(rank << 1);
+			AddToScore((rank + 1) << 1);
 			return newFruit;
 		}
 
