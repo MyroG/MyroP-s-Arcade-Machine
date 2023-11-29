@@ -50,6 +50,7 @@ namespace myro.arcade
 			transform.parent = parent;
 			transform.localPosition = localPosition;
 			FruitCollider.enabled = false;
+			FruitCollider.contactOffset = 0.0001f;
 			RigidbodyInstance.isKinematic = true;
 			
 			_rank = rank;
@@ -87,7 +88,7 @@ namespace myro.arcade
 			FruitCollider.enabled = true;
 			RigidbodyInstance.isKinematic = false;
 			RigidbodyInstance.collisionDetectionMode = CollisionDetectionMode.Continuous;
-			FruitCollider.contactOffset = 0.0001f;
+			
 			_currentColliderRadius = TARGET_COLLIDER_RADIUS * 0.66f;
 			SetScaleAndRotation();
 		}
@@ -100,7 +101,7 @@ namespace myro.arcade
 			RigidbodyInstance.velocity = transform.parent.TransformDirection(localVelocity);
 
 			//Gravity on the local space
-			RigidbodyInstance.AddForce(transform.parent.up.normalized * -5f * _gravityMultiplicator * RigidbodyInstance.mass);
+			RigidbodyInstance.AddForce(transform.parent.up * -5f * _gravityMultiplicator * RigidbodyInstance.mass);
 		}
 
 		private void Update()

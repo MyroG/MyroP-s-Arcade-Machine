@@ -49,7 +49,7 @@ namespace myro.arcade
 			float ratioX = JoystickInstance.GetPositionXRatio();
 			float radiusFruit = 0;
 			if (_currentFruit)
-				radiusFruit = _currentFruit.transform.localScale.x / 2.0f + 0.02f; //We add a little threshold at the end
+				radiusFruit = _currentFruit.transform.localScale.x / 2.0f + 0.01f; //We add a little threshold at the end
 			Vector3 left = new Vector3(LeftWall.localPosition.x + radiusFruit, LeftWall.localPosition.y, LeftWall.localPosition.z);
 			Vector3 right = new Vector3(RightWall.localPosition.x - radiusFruit, RightWall.localPosition.y, RightWall.localPosition.z);
 			return Vector3.Lerp(left, right, ratioX);
@@ -115,8 +115,11 @@ namespace myro.arcade
 
 		public void GameOver()
 		{
-			Destroy(_currentFruit.gameObject);
-			_currentFruit = null;
+			if (_currentFruit != null)
+			{
+				Destroy(_currentFruit.gameObject);
+				_currentFruit = null;
+			}
 			GameOverMessage.SetActive(true);
 			_gameState = GameState.FINISH;
 
