@@ -1,4 +1,5 @@
 ﻿
+using System;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDK3.Data;
@@ -8,7 +9,7 @@ using VRC.Udon;
 namespace myro.arcade
 {
 	[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
-	public class Scoreboard : UdonSharpBehaviour
+	public class SharedScoreboard : UdonSharpBehaviour
 	{
 		[UdonSynced]
 		private string _syncedScoreboard;
@@ -32,19 +33,24 @@ namespace myro.arcade
 
 		public void Insert(VRCPlayerApi player, double score)
 		{
-			// TODO : Known issue : if two players finish the game at the exact same time on two different arcade machines, then the next statement will fail for one of them
-			// This issue is a bit difficult to fix since the owner of the scoreboard might have disabled the arcade machines.
-			// A very rare edge case
-			Networking.SetOwner(Networking.LocalPlayer, gameObject);
-			_scoreboard[player.displayName] = score;
+			_scoreboard[player.displayName] = (double) score;
 
 			SerializeJSON();
 		}
 
+		public DataDictionary GetRanking()
+		{
+			if (_scoreboard == null)
+				_scoreboard = new DataDictionary();
+			return _scoreboard;
+		}
+
 		private void SerializeJSON()
 		{
-			if (!Networking.IsOwner(gameObject))
-				return;
+			// TODO : Known issue : if two players finish the game at the exact same time on two different arcade machines, then the next statement will fail for one of them
+			// This issue is a bit difficult to fix since the owner of the scoreboard might have disabled the arcade machine.
+			// A very rare edge case
+			Networking.SetOwner(Networking.LocalPlayer, gameObject);
 
 			if (VRCJson.TrySerializeToJson(_scoreboard, JsonExportType.Minify, out DataToken result))
 			{

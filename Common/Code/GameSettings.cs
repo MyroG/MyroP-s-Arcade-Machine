@@ -11,5 +11,6 @@ namespace myro.arcade
 	{
 		public RenderTexture RenderTextureToUse;
 		public string ScreenShaderEmissionPropertyName = "_EmissionMap";
+		public SharedScoreboard SharedScoreboardPrefab;
 	}
 }

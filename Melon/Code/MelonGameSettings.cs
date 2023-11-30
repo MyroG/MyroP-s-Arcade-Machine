@@ -8,6 +8,6 @@ namespace myro.arcade
 {
 	public class MelonGameSettings : GameSettings
 	{
-		public Scoreboard ScoreboardInstance;
+
 	}
 }

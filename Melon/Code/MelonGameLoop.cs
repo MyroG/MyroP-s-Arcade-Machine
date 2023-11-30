@@ -20,11 +20,9 @@ namespace myro.arcade
 		public Transform DropTransform;
 		public Transform DeathZone;
 		public GameObject FruitPrefab;
-		public GameObject ScoreboardWrapper;
 		public GameObject GameOverMessage;
 		public MelonGameSettings MelonGameSettingsInstance;
 		public TextMeshProUGUI Score;
-		public TextMeshProUGUI Scoreboard;
 		public Image NextRankImage;
 
 		private Fruit _currentFruit;
@@ -54,12 +52,7 @@ namespace myro.arcade
 
 		void Start()
 		{
-			_gameState = GameState.FINISH;
-			ScoreboardWrapper.SetActive(MelonGameSettingsInstance.ScoreboardInstance);
-			if (MelonGameSettingsInstance.ScoreboardInstance)
-			{
-				MelonGameSettingsInstance.ScoreboardInstance.RegisterBehaviour(this);
-			}
+			_gameState = GameState.FINISH;			
 			GameOver();
 		}
 
@@ -215,14 +208,6 @@ namespace myro.arcade
 			SetTextureOffset(NextRankImage.material, _nextRank);
 			float scale = (_nextRank + 1) * 0.2f + 0.2f;
 			NextRankImage.transform.localScale = new Vector3(scale, scale, scale);
-		}
-
-
-
-		//Called from the Scoreboard script
-		public void RequestScoreboardUpdate()
-		{
-
 		}
 
 		private void UpdateScore()
