@@ -13,7 +13,7 @@ namespace myro.arcade
 		private void OnCollisionEnter(Collision collision)
 		{
 			Fruit anotherFruit = collision.gameObject.GetComponent<Fruit>();
-			if (anotherFruit != null)
+			if (anotherFruit != null && MelonGameLoopInstance.GetGameState() != GameState.FINISH)
 			{
 				MelonGameLoopInstance.GameOver();
 			}

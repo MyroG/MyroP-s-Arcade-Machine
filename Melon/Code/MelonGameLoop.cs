@@ -77,10 +77,16 @@ namespace myro.arcade
 			return Vector3.Lerp(left, right, ratioX);
 		}
 
+		public GameState GetGameState()
+		{
+			return _gameState;
+		}
+
 		public void NewFruit()
 		{
 			short rank = UpdateNextFruitViewAndReturnCurrentRank();
-			_currentFruit = InstantiateNewFruitAt(GetCursorPosition(), rank, false);
+			_currentFruit = InstantiateNewFruitAt(rank, false);
+			_currentFruit.transform.localPosition = GetCursorPosition();
 		}
 
 		public void SetTextureOffset(Material mat, int rank)
@@ -173,7 +179,7 @@ namespace myro.arcade
 				//Here we need to instantiate more fruits
 				for (int i = 0; i < numberOfSyncedFruits - _instantiatedFruits.Count; i++)
 				{
-					InstantiateNewFruitAt(Vector3.zero, 0, false); //the settings will be set later
+					InstantiateNewFruitAt(0, false); //the settings will be set later
 				}
 			}
 			else if (_instantiatedFruits.Count > numberOfSyncedFruits)
@@ -236,8 +242,9 @@ namespace myro.arcade
 				Destroy(_currentFruit.gameObject);
 				_currentFruit = null;
 			}
-			UpdateUI();
 			_gameState = GameState.FINISH;
+
+			UpdateUI();
 
 			if (_instantiatedFruits != null)
 			{
@@ -253,16 +260,16 @@ namespace myro.arcade
 				}
 			}
 
-			if (_score > 2)
+			if (_score > 32)
 			{
 				MelonGameSettingsInstance.SharedScoreboardPrefab.Insert(Networking.LocalPlayer, _score);
 			}
 		}
 
-		public Fruit InstantiateNewFruitAt(Vector3 localPosition, short rank, bool isFused)
+		public Fruit InstantiateNewFruitAt(short rank, bool isFused)
 		{
 			Fruit newFruit = Instantiate(FruitPrefab).GetComponent<Fruit>();
-			newFruit.Construct(transform, localPosition, this, rank, transform.lossyScale.x, DeathZone.localPosition.y, isFused);
+			newFruit.Construct(transform, this, rank, transform.lossyScale.x, DeathZone.localPosition.y, isFused);
 			_instantiatedFruits.Add(newFruit);
 			AddToScore(1 << rank);
 			return newFruit;

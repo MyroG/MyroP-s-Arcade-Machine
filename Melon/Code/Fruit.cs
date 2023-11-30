@@ -39,17 +39,16 @@ namespace myro.arcade
 			{
 				_startTimeAboveLimit = Time.time;
 			}
-			else if (Time.time - _startTimeAboveLimit > 1.0f)
+			else if (Time.time - _startTimeAboveLimit > 1.0f && _melonGameLoopInstance.GetGameState() != GameState.FINISH)
 			{
 				_melonGameLoopInstance.GameOver();
 			}
 		}
 #endregion
 
-		public void Construct(Transform parent, Vector3 localPosition, MelonGameLoop melonGameLoopInstance, short rank, float gameScale, float yAxisLimit, bool isFused)
+		public void Construct(Transform parent, MelonGameLoop melonGameLoopInstance, short rank, float gameScale, float yAxisLimit, bool isFused)
 		{
 			transform.parent = parent;
-			transform.localPosition = localPosition;
 			FruitCollider.enabled = false;
 			RigidbodyInstance.isKinematic = true;
 			
@@ -143,7 +142,8 @@ namespace myro.arcade
 					gameObject.SetActive(false);
 					anotherFruit.gameObject.SetActive(false);
 
-					Fruit newFruit = _melonGameLoopInstance.InstantiateNewFruitAt((anotherFruit.transform.localPosition + transform.localPosition) / 2.0f, (short)(_rank + 1), true);
+					Fruit newFruit = _melonGameLoopInstance.InstantiateNewFruitAt((short)(_rank + 1), true);
+					newFruit.transform.localPosition = (anotherFruit.transform.localPosition + transform.localPosition) / 2.0f;
 					newFruit.DropFruit();
 				}
 			}
