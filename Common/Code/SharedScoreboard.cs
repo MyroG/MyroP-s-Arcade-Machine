@@ -18,12 +18,22 @@ namespace myro.arcade
 		private DataList _connectedScoreboards;
 		void Start()
 		{
-			_scoreboard = new DataDictionary();
-			_connectedScoreboards = new DataList();
+
+		}
+
+		private void CheckReferences()
+		{
+			if (_connectedScoreboards == null)
+				_connectedScoreboards = new DataList();
+
+			if (_scoreboard == null)
+				_scoreboard = new DataDictionary();
 		}
 
 		public void RegisterBehaviour(UdonSharpBehaviour usharpBehaviour)
 		{
+			CheckReferences();
+
 			if (_connectedScoreboards.IndexOf(usharpBehaviour) == -1)
 			{
 				_connectedScoreboards.Add(usharpBehaviour);
@@ -31,17 +41,17 @@ namespace myro.arcade
 		}
 
 
-		public void Insert(VRCPlayerApi player, double score)
+		public void Insert(VRCPlayerApi player, int score)
 		{
-			_scoreboard[player.displayName] = (double) score;
+			CheckReferences();
+			_scoreboard[score.ToString()] = player.displayName;
 
 			SerializeJSON();
 		}
 
 		public DataDictionary GetRanking()
 		{
-			if (_scoreboard == null)
-				_scoreboard = new DataDictionary();
+			CheckReferences();
 			return _scoreboard;
 		}
 
@@ -70,6 +80,7 @@ namespace myro.arcade
 
 		private void HandleOnDeserialization()
 		{
+			CheckReferences();
 			DeserializeJSON();
 
 			for (int i = 0; i < _connectedScoreboards.Count; i++)

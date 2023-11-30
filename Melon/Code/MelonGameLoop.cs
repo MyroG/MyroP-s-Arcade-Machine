@@ -246,10 +246,16 @@ namespace myro.arcade
 					Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
 					if (fruit)
 					{
+						fruit.RigidbodyInstance.collisionDetectionMode = CollisionDetectionMode.Discrete; //to avoid warnings...
 						fruit.RigidbodyInstance.isKinematic = true;
 						fruit.enabled = false;
 					}
 				}
+			}
+
+			if (_score > 2)
+			{
+				MelonGameSettingsInstance.SharedScoreboardPrefab.Insert(Networking.LocalPlayer, _score);
 			}
 		}
 

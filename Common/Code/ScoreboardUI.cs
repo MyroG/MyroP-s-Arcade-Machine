@@ -1,4 +1,5 @@
 ﻿
+using System;
 using TMPro;
 using UdonSharp;
 using UnityEngine;
@@ -33,27 +34,55 @@ namespace myro.arcade
 			}
 		}
 
+		/// <summary>
+		/// Converts a dt[str] = str data dictionary to dt[int] = str, because TrySerialize can only serialize string keys, so you need to convert the string back to int
+		/// </summary>
+		/// <param name="dt"></param>
+		/// <returns></returns>
+		private DataDictionary GetNumberIndexedDT(DataDictionary dt)
+		{
+			DataDictionary ret = new DataDictionary();
+			DataList keys = dt.GetKeys();
+
+			for (int i = 0; i < keys.Count; i++)
+			{
+				ret[Convert.ToInt16((keys[i].String))] = dt[keys[i]]; 
+			}
+			return ret;
+		}
+
+		private DataList InvertDataList(DataList dl)
+		{
+			DataList ret = new DataList();
+			for (int i = dl.Count - 1; i >= 0; i--)
+			{
+				ret.Add(dl[i]);
+			}
+			return ret;
+		}
+
 		//Called from the Scoreboard script
 		public void RequestScoreboardUpdate()
 		{
 			if (!_scoreboardReference)
 				return; //Should never happen, but we never know
 
-			DataDictionary ranking = _scoreboardReference.GetRanking();
-
-			//the format is ranking[score] = name
+			DataDictionary ranking = GetNumberIndexedDT(_scoreboardReference.GetRanking());
+			//the format is ranking[score (int)] = name (str)
 
 			DataList scores = ranking.GetKeys();
 			scores.Sort();
+			scores = InvertDataList(scores);
 
 			int numberFields = Names.Length;
 			int numberScores = scores.Count;
 
 			for (int fieldIndex = 0; fieldIndex < numberFields; fieldIndex++)
 			{
+				
 				bool hasScoreAtPosition = fieldIndex < numberScores;
 				string name = hasScoreAtPosition ? ranking[scores[fieldIndex]].String : "";
-				string score = hasScoreAtPosition ? scores[fieldIndex].Double.ToString() : "";
+				string score = hasScoreAtPosition ? scores[fieldIndex].Int.ToString() : "";
 
 				if (UpperCaseNames)
 					name = name.ToUpper();
