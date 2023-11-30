@@ -12,7 +12,7 @@ namespace myro.arcade
 		public MeshRenderer MeshRendererInstance;
 		public CapsuleCollider FruitCollider;
 
-		private int _rank = 0;
+		private short _rank = 0;
 
 		private MelonGameLoop _melonGameLoopInstance;
 
@@ -21,7 +21,7 @@ namespace myro.arcade
 		private float	_gravityMultiplicator;
 		private bool	_hadCollision;
 
-		#region Game Over Detection
+#region Game Over Detection
 		private float _yAxisLimit; //If one fruit stays above that limit for more than a second, the game is lost
 		private float _startTimeAboveLimit;
 
@@ -45,36 +45,43 @@ namespace myro.arcade
 			}
 		}
 #endregion
-		public void Construct(Transform parent, Vector3 localPosition, MelonGameLoop melonGameLoopInstance, int rank, float gameScale, float yAxisLimit, bool isFused)
+
+		public void Construct(Transform parent, Vector3 localPosition, MelonGameLoop melonGameLoopInstance, short rank, float gameScale, float yAxisLimit, bool isFused)
 		{
 			transform.parent = parent;
 			transform.localPosition = localPosition;
 			FruitCollider.enabled = false;
-			FruitCollider.contactOffset = 0.0001f;
 			RigidbodyInstance.isKinematic = true;
 			
-			_rank = rank;
 			_hadCollision = isFused;
 			_yAxisLimit = yAxisLimit;
 
-			//In the original game, a cherry is 22 wide, and a melon 184px, the box is 315px wide
-			float fruitScale = 0.22f + rank * 0.147272f;
-			transform.localScale = new Vector3(fruitScale, fruitScale, fruitScale);
-
 			_currentColliderRadius = TARGET_COLLIDER_RADIUS;
-			MeshRendererInstance.material.SetTextureOffset("_MainTex", new Vector2((rank % 4) / 4.0f, (rank / 4) / 4.0f));
+			
 			_gravityMultiplicator = gameScale;
 			_melonGameLoopInstance = melonGameLoopInstance;
-			RigidbodyInstance.mass = fruitScale * fruitScale * 3.1415926f;
+			
 			RigidbodyInstance.drag = 0;
 			RigidbodyInstance.angularDrag = 1f;
 
+			SetRank(rank);
 			SetScaleAndRotation();
 		}
 
-		public int GetRank()
+		public short GetRank()
 		{
 			return _rank;
+		}
+
+		public void SetRank(short rank)
+		{
+			_rank = rank;
+			//In the original game, I found that the container is 315px wide, a cherry 22px wide, and a melon 184px
+			//I am calculating the scale of each fruit based on their rank
+			float fruitScale = 0.22f + rank * 0.147272f;
+			transform.localScale = new Vector3(fruitScale, fruitScale, fruitScale);
+			RigidbodyInstance.mass = fruitScale * fruitScale * 3.1415926f;
+			_melonGameLoopInstance.SetTextureOffset(MeshRendererInstance.material, rank);
 		}
 
 		private void SetScaleAndRotation()
@@ -89,9 +96,12 @@ namespace myro.arcade
 			RigidbodyInstance.isKinematic = false;
 			RigidbodyInstance.collisionDetectionMode = CollisionDetectionMode.Continuous;
 			
-			_currentColliderRadius = TARGET_COLLIDER_RADIUS * 0.66f;
+			_currentColliderRadius = TARGET_COLLIDER_RADIUS * 0.5f;
+			FruitCollider.contactOffset = 0.0001f; //Using the script "ColliderParameterSetter" didn't worked, so I am setting it here. 
 			SetScaleAndRotation();
 		}
+
+#region Unity Events
 
 		private void FixedUpdate()
 		{
@@ -107,7 +117,7 @@ namespace myro.arcade
 		private void Update()
 		{
 			CheckGameOver();
-			_currentColliderRadius += (TARGET_COLLIDER_RADIUS - _currentColliderRadius) * Time.deltaTime * 2.5f;
+			_currentColliderRadius += (TARGET_COLLIDER_RADIUS - _currentColliderRadius) * Time.deltaTime * 3f;
 
 			//Local rotation contraint
 			SetScaleAndRotation();
@@ -133,10 +143,13 @@ namespace myro.arcade
 					gameObject.SetActive(false);
 					anotherFruit.gameObject.SetActive(false);
 
-					Fruit newFruit = _melonGameLoopInstance.InstantiateNewFruitAt((anotherFruit.transform.localPosition + transform.localPosition) / 2.0f, _rank + 1, true);
+					Fruit newFruit = _melonGameLoopInstance.InstantiateNewFruitAt((anotherFruit.transform.localPosition + transform.localPosition) / 2.0f, (short)(_rank + 1), true);
 					newFruit.DropFruit();
 				}
 			}
 		}
+
+#endregion
+
 	}
 }

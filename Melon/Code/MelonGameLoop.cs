@@ -2,6 +2,7 @@
 using TMPro;
 using UdonSharp;
 using UnityEngine;
+using UnityEngine.UI;
 using VRC.SDK3.Data;
 using VRC.SDKBase;
 using VRC.Udon;
@@ -24,9 +25,12 @@ namespace myro.arcade
 		public MelonGameSettings MelonGameSettingsInstance;
 		public TextMeshProUGUI Score;
 		public TextMeshProUGUI Scoreboard;
+		public Image NextRankImage;
 
 		private Fruit _currentFruit;
 		private DataList _instantiatedFruits;
+
+		private const float SYNCING_RATE = 0.2f;
 
 		[UdonSynced]
 		private GameState _gameState;
@@ -34,14 +38,39 @@ namespace myro.arcade
 		[UdonSynced]
 		private int _score;
 
+		[UdonSynced]
+		private short _nextRank;
+
+		[UdonSynced]
+		private Vector3[] _positionFruits;
+
+		[UdonSynced]
+		private Quaternion[] _rotationFruits;
+
+		[UdonSynced]
+		private short[] _rankFruits;
+
+
+
 		void Start()
 		{
+			_gameState = GameState.FINISH;
 			ScoreboardWrapper.SetActive(MelonGameSettingsInstance.ScoreboardInstance);
 			if (MelonGameSettingsInstance.ScoreboardInstance)
 			{
 				MelonGameSettingsInstance.ScoreboardInstance.RegisterBehaviour(this);
 			}
-			StartGame();
+			GameOver();
+		}
+
+		private short UpdateNextFruitViewAndReturnCurrentRank()
+		{
+			short newRank = _nextRank;
+			_nextRank = (short) Random.Range(0, 5);
+
+			UpdateNextRankImage();
+
+			return newRank;
 		}
 
 		private Vector3 GetCursorPosition()
@@ -57,8 +86,65 @@ namespace myro.arcade
 
 		public void NewFruit()
 		{
-			int rank = Random.Range(0, 5);
+			short rank = UpdateNextFruitViewAndReturnCurrentRank();
 			_currentFruit = InstantiateNewFruitAt(GetCursorPosition(), rank, false);
+		}
+
+		public void SetTextureOffset(Material mat, int rank)
+		{
+			mat.SetTextureOffset("_MainTex", new Vector2((rank % 4) / 4.0f, (rank / 4) / 4.0f));
+		}
+
+		private void StartGame()
+		{
+			if (_instantiatedFruits != null)
+			{
+				for (int i = 0; i < _instantiatedFruits.Count; i++)
+				{
+					Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
+					if (fruit)
+						Destroy(fruit.gameObject);
+				}
+			}
+			_instantiatedFruits = new DataList();
+
+			_score = 0;
+			_gameState = GameState.PLAY;
+			NewFruit();
+			SyncingLoop();
+			UpdateUIState();
+		}
+
+		public void AddToScore(int points)
+		{
+			_score += points;
+			UpdateScore();
+		}
+
+		#region Events and syncing
+
+		public void SyncingLoop()
+		{
+			if (_gameState == GameState.FINISH || _instantiatedFruits == null)
+				return;
+
+			int length = _instantiatedFruits.Count;
+			_positionFruits = new Vector3[length];
+			_rotationFruits = new Quaternion[length];
+			_rankFruits = new short[length];
+
+			for (int i = 0; i < length; i++)
+			{
+				Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
+				if (!fruit)
+					return;
+
+				_positionFruits[i] = fruit.transform.localPosition;
+				_rotationFruits[i] = fruit.transform.localRotation;
+				_rankFruits[i] = fruit.GetRank();
+			}
+			RequestSerialization();
+			SendCustomEventDelayedSeconds(nameof(SyncingLoop), SYNCING_RATE);
 		}
 
 		public void OnPress()
@@ -77,30 +163,61 @@ namespace myro.arcade
 			}
 		}
 
-		private void StartGame()
+		// Here, OnDeserialization should only be called for the remote player
+		public override void OnDeserialization()
 		{
-			if (_instantiatedFruits != null)
+			UpdateUI();
+
+			if (_instantiatedFruits == null)
 			{
-				for (int i = 0; i < _instantiatedFruits.Count; i++)
+				_instantiatedFruits = new DataList();
+			}
+
+			int numberOfSyncedFruits = _positionFruits.Length;
+
+			if (_instantiatedFruits.Count < numberOfSyncedFruits)
+			{
+				//Here we need to instantiate more fruits
+				for (int i = 0; i < numberOfSyncedFruits - _instantiatedFruits.Count; i++)
 				{
-					Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
-					if (fruit)
-						Destroy(fruit.gameObject);
+					InstantiateNewFruitAt(Vector3.zero, 0, false); //the settings will be set later
 				}
 			}
-			_instantiatedFruits = new DataList();
+			else if (_instantiatedFruits.Count > numberOfSyncedFruits)
+			{
+				//Here we need to destroy a few fruits
+				for (int i = 0; i < _instantiatedFruits.Count - numberOfSyncedFruits; i++)
+				{
+					Fruit fruit = (Fruit)_instantiatedFruits[0].Reference;
+					Destroy(fruit.gameObject);
+					_instantiatedFruits.RemoveAt(0);
+				}
+			}
 
-			GameOverMessage.SetActive(false);
-			_score = 0;
-			_gameState = GameState.PLAY;
-			NewFruit();
+			for (int i = 0; i < numberOfSyncedFruits; i++)
+			{
+				//Now we update each fruit
+				Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
+				fruit.transform.localPosition = _positionFruits[i];
+				fruit.transform.localRotation = _rotationFruits[i];
+				fruit.SetRank(_rankFruits[i]);
+				fruit.enabled = false; //the scripts do not need to be enabled for the remote player
+			}
 		}
 
-		public void AddToScore(int points)
+		#endregion
+
+
+
+		#region UI
+		private void UpdateNextRankImage()
 		{
-			_score += points;
-			UpdateUI();
+			SetTextureOffset(NextRankImage.material, _nextRank);
+			float scale = (_nextRank + 1) * 0.2f + 0.2f;
+			NextRankImage.transform.localScale = new Vector3(scale, scale, scale);
 		}
+
+
 
 		//Called from the Scoreboard script
 		public void RequestScoreboardUpdate()
@@ -108,10 +225,24 @@ namespace myro.arcade
 
 		}
 
-		private void UpdateUI()
+		private void UpdateScore()
 		{
 			Score.text = _score.ToString();
 		}
+
+		private void UpdateUIState()
+		{
+			GameOverMessage.SetActive(_gameState == GameState.FINISH);
+		}
+
+		private void UpdateUI()
+		{
+			UpdateScore();
+			UpdateUIState();
+			UpdateNextRankImage();
+		}
+
+		#endregion
 
 		public void GameOver()
 		{
@@ -120,24 +251,29 @@ namespace myro.arcade
 				Destroy(_currentFruit.gameObject);
 				_currentFruit = null;
 			}
-			GameOverMessage.SetActive(true);
+			UpdateUI();
 			_gameState = GameState.FINISH;
 
-			for (int i = 0; i < _instantiatedFruits.Count; i++)
+			if (_instantiatedFruits != null)
 			{
-				Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
-				if (fruit)
-					fruit.RigidbodyInstance.isKinematic = true;
+				for (int i = 0; i < _instantiatedFruits.Count; i++)
+				{
+					Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
+					if (fruit)
+					{
+						fruit.RigidbodyInstance.isKinematic = true;
+						fruit.enabled = false;
+					}
+				}
 			}
 		}
 
-		internal Fruit InstantiateNewFruitAt(Vector3 localPosition, int rank, bool isFused)
+		public Fruit InstantiateNewFruitAt(Vector3 localPosition, short rank, bool isFused)
 		{
 			Fruit newFruit = Instantiate(FruitPrefab).GetComponent<Fruit>();
 			newFruit.Construct(transform, localPosition, this, rank, transform.lossyScale.x, DeathZone.localPosition.y, isFused);
 			_instantiatedFruits.Add(newFruit);
-
-			AddToScore((rank + 1) << 1);
+			AddToScore(1 << rank);
 			return newFruit;
 		}
 

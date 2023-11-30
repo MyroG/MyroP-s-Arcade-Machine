@@ -29,11 +29,15 @@ namespace myro.arcade
 			}
 		}
 
+
 		public void Insert(VRCPlayerApi player, double score)
 		{
+			// TODO : Known issue : if two players finish the game at the exact same time on two different arcade machines, then the next statement will fail for one of them
+			// This issue is a bit difficult to fix since the owner of the scoreboard might have disabled the arcade machines.
+			// A very rare edge case
+			Networking.SetOwner(Networking.LocalPlayer, gameObject);
 			_scoreboard[player.displayName] = score;
 
-			
 			SerializeJSON();
 		}
 
@@ -46,7 +50,7 @@ namespace myro.arcade
 			{
 				_syncedScoreboard = result.String;
 				RequestSerialization();
-
+				HandleOnDeserialization();
 			}
 		}
 
