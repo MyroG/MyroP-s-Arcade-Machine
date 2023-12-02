@@ -58,6 +58,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 4682292357218806751}
   RenderTextureToUse: {fileID: 8400000, guid: f84f94e348e9f5845becb4fe26f0f04d, type: 2}
   ScreenShaderEmissionPropertyName: _EmissionMap
+  SharedScoreboardPrefab: {fileID: 0}
   GameDuration: 60
   NumberWalls: 19
 --- !u!114 &4682292357218806751
@@ -151,8 +152,9 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 8912085146547765213}
-  MainGameInstance: {fileID: 0}
+  MainGameInstance: {fileID: 3716081195428954309}
   JoystickInstance: {fileID: 5962929359902561735}
+  Toggleable: {fileID: 1459259898385149787}
 --- !u!114 &6666153927121750546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1154,13 +1156,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d4958e4284fca404fb2359a768d55ba5, type: 3}
+--- !u!1 &1459259898385149787 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8960389017662371915, guid: d4958e4284fca404fb2359a768d55ba5,
+    type: 3}
+  m_PrefabInstance: {fileID: 7501281136428685072}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &3716081195428954309 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6596589673653917653, guid: d4958e4284fca404fb2359a768d55ba5,
     type: 3}
   m_PrefabInstance: {fileID: 7501281136428685072}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1459259898385149787}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7830fd515a87f24780984489163fee3, type: 3}
@@ -1172,7 +1180,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 7501281136428685072}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1459259898385149787}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}

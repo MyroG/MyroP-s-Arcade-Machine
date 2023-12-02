@@ -14,7 +14,7 @@ namespace myro.arcade
 	{
 		public Transform LeftWall;
 		public Transform RightWall;
-
+		public Transform Root;
 		public Joystick JoystickInstance;
 
 		public Transform DropTransform;
@@ -24,11 +24,13 @@ namespace myro.arcade
 		public MelonGameSettings MelonGameSettingsInstance;
 		public TextMeshProUGUI Score;
 		public Image NextRankImage;
+		public GameObject WaitMessage;
 
 		private Fruit _currentFruit;
 		private DataList _instantiatedFruits;
 
 		private const float SYNCING_RATE = 0.2f;
+		private int _combo;
 
 		[UdonSynced]
 		private GameState _gameState;
@@ -48,7 +50,13 @@ namespace myro.arcade
 		[UdonSynced]
 		private short[] _rankFruits;
 
-
+		private void OnDisable()
+		{
+			if (Networking.IsOwner(gameObject))
+			{
+				GameOver();
+			}
+		}
 
 		void Start()
 		{
@@ -89,6 +97,7 @@ namespace myro.arcade
 			_currentFruit.transform.localPosition = GetCursorPosition();
 		}
 
+
 		public void SetTextureOffset(Material mat, int rank)
 		{
 			mat.SetTextureOffset("_MainTex", new Vector2((rank % 4) / 4.0f, (rank / 4) / 4.0f));
@@ -96,6 +105,8 @@ namespace myro.arcade
 
 		private void StartGame()
 		{
+			WaitMessage.SetActive(false);
+
 			if (_instantiatedFruits != null)
 			{
 				for (int i = 0; i < _instantiatedFruits.Count; i++)
@@ -122,9 +133,12 @@ namespace myro.arcade
 
 		#region Events and syncing
 
+		/// <summary>
+		/// This looping method should only be called by the owner, it syncs the data
+		/// </summary>
 		public void SyncingLoop()
 		{
-			if (_gameState == GameState.FINISH || _instantiatedFruits == null)
+			if (_gameState == GameState.FINISH || _instantiatedFruits == null || !Networking.IsOwner(gameObject))
 				return;
 
 			int length = _instantiatedFruits.Count;
@@ -146,14 +160,58 @@ namespace myro.arcade
 			SendCustomEventDelayedSeconds(nameof(SyncingLoop), SYNCING_RATE);
 		}
 
+		/// <summary>
+		/// This event is called from the Joystick script
+		/// </summary>
+		public void PlayerPickedUpJoystick()
+		{
+			WaitMessage.SetActive(!Networking.IsOwner(gameObject));
+			if (_gameState == GameState.FINISH)
+			{
+				Networking.SetOwner(Networking.LocalPlayer, gameObject);
+			}
+		}
+
+		/// <summary>
+		/// This event is called from the Joystick script
+		/// </summary>
+		public void PlayerDroppedJoystick()
+		{
+			WaitMessage.SetActive(false);
+		}
+
+		bool _isPlayerInArea;
+		public void OnPlayerEnteredArea()
+		{
+			_isPlayerInArea = true;
+		}
+
+		public void OnPlayerExitedArea()
+		{
+			_isPlayerInArea = false;
+		}
+
+		public override void OnOwnershipTransferred(VRCPlayerApi player)
+		{
+			if (!player.isLocal)
+			{
+				_currentFruit = null;
+			}
+		}
+
 		public void OnPress()
 		{
+			if (!Networking.IsOwner(gameObject))
+				return;
+
 			if (_gameState == GameState.PLAY)
 			{
 				if (_currentFruit != null)
 				{
 					_currentFruit.DropFruit();
 					_currentFruit = null;
+					_combo = 0;
+					SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayDropAudio));
 				}
 			}
 			else
@@ -162,9 +220,22 @@ namespace myro.arcade
 			}
 		}
 
+		public void OnResetPressed()
+		{
+			if (!Networking.IsOwner(gameObject))
+				Networking.SetOwner(Networking.LocalPlayer, gameObject);
+
+			StartGame();
+		}
+
+		
+
 		// Here, OnDeserialization should only be called for the remote player
 		public override void OnDeserialization()
 		{
+			if (!_isPlayerInArea)
+				return;
+
 			UpdateUI();
 
 			if (_instantiatedFruits == null)
@@ -195,17 +266,20 @@ namespace myro.arcade
 
 			for (int i = 0; i < numberOfSyncedFruits; i++)
 			{
-				//Now we update each fruit
-				Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
-				fruit.transform.localPosition = _positionFruits[i];
-				fruit.transform.localRotation = _rotationFruits[i];
-				fruit.SetRank(_rankFruits[i]);
-				fruit.enabled = false; //the scripts do not need to be enabled for the remote player
+				if (_instantiatedFruits[i].Error == DataError.None)
+				{
+					//Now we update each fruit
+					Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
+					fruit.gameObject.SetActive(true);
+					fruit.transform.localPosition = _positionFruits[i];
+					fruit.transform.localRotation = _rotationFruits[i];
+					fruit.SetRank(_rankFruits[i]);
+					fruit.enabled = false; //the scripts does not need to be enabled for the remote player
+				}
 			}
 		}
 
 		#endregion
-
 
 
 		#region UI
@@ -244,6 +318,7 @@ namespace myro.arcade
 			}
 			_gameState = GameState.FINISH;
 
+			WaitMessage.SetActive(false);
 			UpdateUI();
 
 			if (_instantiatedFruits != null)
@@ -264,12 +339,14 @@ namespace myro.arcade
 			{
 				MelonGameSettingsInstance.SharedScoreboardPrefab.Insert(Networking.LocalPlayer, _score);
 			}
+
+			RequestSerialization();
 		}
 
 		public Fruit InstantiateNewFruitAt(short rank, bool isFused)
 		{
 			Fruit newFruit = Instantiate(FruitPrefab).GetComponent<Fruit>();
-			newFruit.Construct(transform, this, rank, transform.lossyScale.x, DeathZone.localPosition.y, isFused);
+			newFruit.Construct(Root, this, rank, transform.lossyScale.x, DeathZone.localPosition.y, isFused);
 			_instantiatedFruits.Add(newFruit);
 			AddToScore(1 << rank);
 			return newFruit;
@@ -293,5 +370,49 @@ namespace myro.arcade
 		{
 			NewFruit();
 		}
+
+		#region Audio
+
+		public AudioSource AudioPlayer;
+		public AudioClip Drop;
+		public AudioClip Collision;
+		public AudioClip Combo;
+
+		public void IncrementComboAndPlayAudio()
+		{
+			_combo++;
+			AudioPlayer.pitch = 1 + _combo / 6.0f;
+			SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayComboAudio));
+		}
+
+		public void PlayComboAudio()
+		{
+			if (!_isPlayerInArea)
+				return;
+
+			AudioPlayer.clip = Combo;
+			AudioPlayer.Play();
+		}
+
+		public void PlayCollisionAudio()
+		{
+			if (!_isPlayerInArea)
+				return;
+
+			AudioPlayer.pitch = 1;
+			AudioPlayer.clip = Collision;
+			AudioPlayer.Play();
+		}
+
+		public void PlayDropAudio()
+		{
+			if (!_isPlayerInArea)
+				return;
+
+			AudioPlayer.pitch = 1;
+			AudioPlayer.clip = Drop;
+			AudioPlayer.Play();
+		}
+		#endregion
 	}
 }

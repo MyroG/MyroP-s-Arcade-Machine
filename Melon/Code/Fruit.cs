@@ -127,25 +127,35 @@ namespace myro.arcade
 
 		private void OnCollisionEnter(Collision collision)
 		{
+			if (gameObject.activeSelf && enabled)
+			{
+				if (_rank != 10)
+				{
+					Fruit anotherFruit = collision.gameObject.GetComponent<Fruit>();
+					if (anotherFruit && _rank == anotherFruit.GetRank() && collision.gameObject.activeSelf)
+					{
+						_melonGameLoopInstance.DestroyFruit(this);
+						_melonGameLoopInstance.DestroyFruit(anotherFruit);
+						_melonGameLoopInstance.IncrementComboAndPlayAudio();
+						gameObject.SetActive(false);
+						anotherFruit.gameObject.SetActive(false);
+
+						Fruit newFruit = _melonGameLoopInstance.InstantiateNewFruitAt((short)(_rank + 1), true);
+						newFruit.transform.localPosition = (anotherFruit.transform.localPosition + transform.localPosition) / 2.0f;
+						newFruit.DropFruit();
+					}
+					else if (!_hadCollision)
+					{
+						_melonGameLoopInstance.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(_melonGameLoopInstance.PlayCollisionAudio));
+					}
+				}
+				
+				
+			}
 			if (!_hadCollision)
 			{
 				_melonGameLoopInstance.ReadyForNextFruit();
 				_hadCollision = true;
-			}
-			if (gameObject.activeSelf && _rank != 10)
-			{
-				Fruit anotherFruit = collision.gameObject.GetComponent<Fruit>();
-				if (anotherFruit != null && _rank == anotherFruit.GetRank() && collision.gameObject.activeSelf)
-				{
-					_melonGameLoopInstance.DestroyFruit(this);
-					_melonGameLoopInstance.DestroyFruit(anotherFruit);
-					gameObject.SetActive(false);
-					anotherFruit.gameObject.SetActive(false);
-
-					Fruit newFruit = _melonGameLoopInstance.InstantiateNewFruitAt((short)(_rank + 1), true);
-					newFruit.transform.localPosition = (anotherFruit.transform.localPosition + transform.localPosition) / 2.0f;
-					newFruit.DropFruit();
-				}
 			}
 		}
 

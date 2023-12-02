@@ -9,8 +9,9 @@ namespace myro.arcade
 	[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 	public class Trigger : UdonSharpBehaviour
 	{
-		public GameObject MainGameInstance;
+		public UdonSharpBehaviour MainGameInstance;
 		public Joystick JoystickInstance;
+		public GameObject Toggleable;
 		void Start()
 		{
 
@@ -20,7 +21,8 @@ namespace myro.arcade
 		{
 			if (player.isLocal)
 			{
-				MainGameInstance.SetActive(true);
+				Toggleable.SetActive(true);
+				MainGameInstance.SendCustomEvent("OnPlayerEnteredArea");
 			}
 		}
 
@@ -28,8 +30,8 @@ namespace myro.arcade
 		{
 			if (player.isLocal)
 			{
-				MainGameInstance.SetActive(false);
-				JoystickInstance.ForceDrop();
+				Toggleable.SetActive(false);
+				MainGameInstance.SendCustomEvent("OnPlayerExitedArea");
 			}
 		}
 	}

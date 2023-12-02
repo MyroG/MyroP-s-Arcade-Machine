@@ -7,9 +7,10 @@ using VRC.Udon.Common;
 
 namespace myro.arcade
 {
+	[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 	public class Button : UdonSharpBehaviour
 	{
-		public MainGame MainGameInstance;
+		public UdonSharpBehaviour MainGameInstance;
 		public string EventName;
 
 		void Start()
