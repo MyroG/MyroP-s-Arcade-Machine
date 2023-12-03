@@ -24,6 +24,7 @@ Before importing this asset, make sure you have imported
 - TextMeshPro
 
 Installation steps :
+- If you have already imported the arcade machine previously, delete the MyroP/Arcade folder before continuing
 - Get the latest release from https://github.com/MyroG/MyroP-s-Arcade-Machine/releases, download the .unitypackage file, and install it into your project.
 - In the folder MyroP/Arcade you can find 3 prefabs "ArcadeHeliCave", "ArcadeMelonGame" and "SharedScoreboard"
     - If you want to add the "HeliCave" game into your world, just drag&drop it into your scene.
