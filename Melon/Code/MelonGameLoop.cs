@@ -25,6 +25,7 @@ namespace myro.arcade
 		public TextMeshProUGUI Score;
 		public Image NextRankImage;
 		public GameObject WaitMessage;
+		public AudioSource Music;
 
 		private Fruit _currentFruit;
 		private DataList _instantiatedFruits;
@@ -115,6 +116,7 @@ namespace myro.arcade
 			NewFruit();
 			SyncingLoop();
 			UpdateUIState();
+			Music.Play();
 		}
 
 		public void AddToScore(int points)
@@ -228,6 +230,11 @@ namespace myro.arcade
 			if (!_isPlayerInArea)
 				return;
 
+			if (_gameState == GameState.PLAY && !Music.isPlaying)
+				Music.Play();
+			else if (_gameState == GameState.FINISH && Music.isPlaying)
+				Music.Stop();
+
 			UpdateUI();
 
 			if (_instantiatedFruits == null)
@@ -315,6 +322,8 @@ namespace myro.arcade
 
 		public void GameOver()
 		{
+			Music.Stop();
+
 			if (_currentFruit != null)
 			{
 				Destroy(_currentFruit.gameObject);
@@ -325,6 +334,8 @@ namespace myro.arcade
 			WaitMessage.SetActive(false);
 			UpdateUI();
 
+
+			//pausing all physics
 			if (_instantiatedFruits != null)
 			{
 				for (int i = 0; i < _instantiatedFruits.Count; i++)
@@ -339,7 +350,7 @@ namespace myro.arcade
 				}
 			}
 
-			if (_score > 32)
+			if (_score > 32 && MelonGameSettingsInstance.SharedScoreboardPrefab)
 			{
 				MelonGameSettingsInstance.SharedScoreboardPrefab.Insert(Networking.LocalPlayer, _score);
 			}

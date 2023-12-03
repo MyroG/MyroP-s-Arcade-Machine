@@ -41,7 +41,7 @@ namespace myro.arcade
 		}
 
 
-		public void Insert(VRCPlayerApi player, int score)
+		public void Insert(VRCPlayerApi player, long score)
 		{
 			CheckReferences();
 			_scoreboard[score.ToString()] = player.displayName;

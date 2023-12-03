@@ -443,6 +443,7 @@ MonoBehaviour:
   GameSettingsInstance: {fileID: 8878259032881581398}
   CameraLookingAtGame: {fileID: 3794125535994639600}
   ScreenRenderer: {fileID: 2066693102322940193}
+  Music: {fileID: 6113056947015268869}
 --- !u!114 &5677248086025735539
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -597,6 +598,7 @@ MonoBehaviour:
   RenderTextureToUse: {fileID: 8400000, guid: 4bc91986f563cf74385251ac5c0f93af, type: 2}
   ScreenShaderEmissionPropertyName: _EmissionMap
   SharedScoreboardPrefab: {fileID: 0}
+  Music: {fileID: 0}
 --- !u!114 &8878259032881581399
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1362,6 +1364,11 @@ PrefabInstance:
       propertyPath: _syncMethod
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7451285389045707431, guid: 6ecb7fd477a06184b9b86b87a39135c3,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 17.21
+      objectReference: {fileID: 0}
     - target: {fileID: 7540305975734653428, guid: 6ecb7fd477a06184b9b86b87a39135c3,
         type: 3}
       propertyPath: _syncMethod
@@ -1586,18 +1593,12 @@ PrefabInstance:
       objectReference: {fileID: 8878259032881581398}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6ecb7fd477a06184b9b86b87a39135c3, type: 3}
---- !u!114 &2973462302276209484 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8856973310330056112, guid: 6ecb7fd477a06184b9b86b87a39135c3,
+--- !u!4 &5792409085835086072 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 273403628576108036, guid: 6ecb7fd477a06184b9b86b87a39135c3,
     type: 3}
   m_PrefabInstance: {fileID: 6028515022972839676}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51ec9f3adf6c4ff4c8098c88f688acca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6543429899568027470 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 677642941204459954, guid: 6ecb7fd477a06184b9b86b87a39135c3,
@@ -1610,9 +1611,21 @@ Camera:
     type: 3}
   m_PrefabInstance: {fileID: 6028515022972839676}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &5792409085835086072 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 273403628576108036, guid: 6ecb7fd477a06184b9b86b87a39135c3,
+--- !u!82 &6113056947015268869 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 539418887288184057, guid: 6ecb7fd477a06184b9b86b87a39135c3,
     type: 3}
   m_PrefabInstance: {fileID: 6028515022972839676}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2973462302276209484 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8856973310330056112, guid: 6ecb7fd477a06184b9b86b87a39135c3,
+    type: 3}
+  m_PrefabInstance: {fileID: 6028515022972839676}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51ec9f3adf6c4ff4c8098c88f688acca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

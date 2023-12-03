@@ -30,12 +30,14 @@ namespace myro.arcade
 
 		public Transform PawnDefaultPosition;
 
+
 		//Each canvas  used in-game
 		public GameObject CanvasPressStart;
 		public GameObject CanvasExplanation;
 		public GameObject CanvasTimer;
 		public GameObject CanvasFinalScore;
 		public GameObject CanvasPauseScreen;
+		public GameObject CanvasScoreboard;
 
 		//Prefabs that get spawned
 		public GameObject PrefabWall;
@@ -56,6 +58,9 @@ namespace myro.arcade
 		public AudioSource Music;
 
 		public GameObject SpawnedWallsWrapper;
+
+
+
 		private GameObject[] _spawnedWallsBottom;
 		private GameObject[] _spawnedWallsTop;
 		private GameObject _spawnedControllable;
@@ -244,6 +249,10 @@ namespace myro.arcade
 			if (!_isPlayerInArea)
 				return;
 
+			CanvasScoreboard.SetActive(_gameState == GameState.START_SCREEN 
+				|| _gameState == GameState.PAUSE
+				|| _gameState == GameState.FINISH);
+
 			if (_gameState == GameState.START_SCREEN)
 			{
 				ResetGame();
@@ -291,6 +300,9 @@ namespace myro.arcade
 				ShowCanvas(CanvasFinalScore);
 				FinalScoreTxt.text = ((long) _currentScore).ToString();
 				InitNextRoundValues();
+
+				if (GameSettingsInstance.SharedScoreboardPrefab)
+					GameSettingsInstance.SharedScoreboardPrefab.Insert(Networking.LocalPlayer, (long) _currentScore);
 			}
 			_gameStateSaved = _gameState;
 		}

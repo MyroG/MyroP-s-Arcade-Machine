@@ -12,6 +12,8 @@ namespace myro.arcade
 		public GameSettings GameSettingsInstance;
 		public Camera CameraLookingAtGame;
 		public MeshRenderer ScreenRenderer;
+		public AudioSource Music;
+
 		void Start()
 		{
 			CameraLookingAtGame.targetTexture = GameSettingsInstance.RenderTextureToUse;
@@ -20,6 +22,7 @@ namespace myro.arcade
 			{
 				ScreenRenderer.material.SetTexture(GameSettingsInstance.ScreenShaderEmissionPropertyName, GameSettingsInstance.RenderTextureToUse);
 			}
+			Music.clip = GameSettingsInstance.Music;
 		}
 	}
 }
