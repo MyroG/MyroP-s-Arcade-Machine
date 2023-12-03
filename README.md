@@ -31,11 +31,6 @@ It is possible to add multiple arcade machines in the same world, but it's unfor
 The arcade machine uses a Render texture to render the game, and render textures are unique for each camera, since each arcade machine has a separate camera the render texture needs to be duplicated :
 - In the folder MyroP/Arcade/RenderTextures, duplicate a Render texture.
 - In the root prefab, drag&drop the render texture in the "Render texture to use" property field
-- You also need to set that render texture on the camera, which can be found under the "game" GameObject.
-
-A short video showing how to duplicate the arcade machine can be seen here :
-
-[![IMAGE ALT TEXT](http://img.youtube.com/vi/BAtLaxdguMQ/0.jpg)](http://www.youtube.com/watch?v=BAtLaxdguMQ "How to duplicate the arcade machine")
 
 ### Settings
 
@@ -71,9 +66,7 @@ I also have a Patreon if you're interested in donating https://www.patreon.com/m
 The game itself is actually filmed by a camera inside the arcade machine, which outputs it on a render texture, the render texture is then applied on the screen.
 I implemented it this way so it's easier to apply custom shaders on the screen, like a CRT screen shader! Those kind of shaders are not included in the package but can be downloaded elsewhere.
 
-As mentioned above, it is not really easy to duplicate an arcade machine, that's because duplicating the arcade machine also requires to duplicate and use a different render texture. I tried to make it more straightforward by automatically creating a Render texture and applying it on the prefab via script, but there are two issues :
-- Creating a new Render texture with `RenderTexture texture = new RenderTexture(...);` is not supported by Udon yet.
-- It's also not possible to assign a new Render Texture to a camera via script, so this line of code `Camera.targetTexture = RenderTextureToUse;`doesn't work... Not sure if that's a Udon bug or an expected behavior.
+As mentioned above, it is not really easy to duplicate an arcade machine, that's because duplicating the arcade machine also requires to duplicate and use a different render texture. I tried to make it more straightforward by automatically creating a Render texture and applying it on the prefab via script, but creating a new Render texture with `RenderTexture texture = new RenderTexture(...);` is not supported by Udon yet.
 
 The game is placed on the "Environment" layer and the camera only picks up that layer, if you want you can change that and the game should still work correctly.
 
