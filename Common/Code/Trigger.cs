@@ -14,7 +14,7 @@ namespace myro.arcade
 		public GameObject Toggleable;
 		void Start()
 		{
-
+			Toggleable.gameObject.SetActive(false);
 		}
 
 		public override void OnPlayerTriggerEnter(VRCPlayerApi player)

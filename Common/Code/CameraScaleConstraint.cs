@@ -14,7 +14,7 @@ namespace myro.arcade
 		void Start()
 		{
 			Camera cam = GetComponent<Camera>();
-			float scale = ConstraintTo.transform.lossyScale.x;
+			float scale = ConstraintTo.lossyScale.x;
 			cam.orthographicSize *= scale;
 			cam.nearClipPlane *= scale;
 			cam.farClipPlane *= scale;

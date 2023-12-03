@@ -105,8 +105,6 @@ namespace myro.arcade
 			SpawnWalls();
 			SpawnPawn();
 			ResetGame();
-
-			gameObject.SetActive(false);
 		}
 
 		private void ShowCanvas(GameObject canvasToShow)
@@ -243,6 +241,9 @@ namespace myro.arcade
 
 		private void HandleOnDeserialization()
 		{
+			if (!_isPlayerInArea)
+				return;
+
 			if (_gameState == GameState.START_SCREEN)
 			{
 				ResetGame();
@@ -398,6 +399,17 @@ namespace myro.arcade
 			};
 		}
 
+		bool _isPlayerInArea;
+		public void OnPlayerEnteredArea()
+		{
+			_isPlayerInArea = true;
+		}
+
+		public void OnPlayerExitedArea()
+		{
+			_isPlayerInArea = false;
+		}
+
 		public void SyncPlayer()
 		{
 			if (_gameState == GameState.PLAY && _gameStarted)
@@ -485,7 +497,8 @@ namespace myro.arcade
 
 		private void Update()
 		{
-			if (_gameState != GameState.PLAY)
+
+			if (_gameState != GameState.PLAY || !_isPlayerInArea)
 			{
 				return;
 			}
@@ -599,23 +612,32 @@ namespace myro.arcade
 
 		public void PlayJumpSound()
 		{
+			if (!_isPlayerInArea)
+				return;
+
 			SoundEffectSource.clip = ClipJump;
 			SoundEffectSource.Play();
 		}
 
 		public void PlaySelectSound()
 		{
+			if (!_isPlayerInArea)
+				return;
+
 			SoundEffectSource.clip = ClipSelection;
 			SoundEffectSource.Play();
 		}
 
 		public void PlayMusic(bool shouldPlayMusic)
 		{
-			Music.gameObject.SetActive(shouldPlayMusic);
+			Music.gameObject.SetActive(shouldPlayMusic && _isPlayerInArea);
 		}
 
 		public void PlayExplosionSound()
 		{
+			if (!_isPlayerInArea)
+				return;
+
 			SoundEffectSource.clip = ClipExplosion;
 			SoundEffectSource.Play();
 		}

@@ -50,14 +50,6 @@ namespace myro.arcade
 		[UdonSynced]
 		private short[] _rankFruits;
 
-		private void OnDisable()
-		{
-			if (Networking.IsOwner(gameObject))
-			{
-				GameOver();
-			}
-		}
-
 		void Start()
 		{
 			_gameState = GameState.FINISH;			
