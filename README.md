@@ -25,7 +25,10 @@ Before importing this asset, make sure you have imported
 
 Installation steps :
 - Get the latest release from https://github.com/MyroG/MyroP-s-Arcade-Machine/releases, download the .unitypackage file, and install it into your project.
-- In the folder MyroP/Arcade you can find 3 prefabs 3 prefabs prefab named "HeliCave", you just need to drag&drop it into your scene.
+- In the folder MyroP/Arcade you can find 3 prefabs "ArcadeHeliCave", "ArcadeMelonGame" and "SharedScoreboard"
+- If you want to add the "HeliCave" game into your world, just drag&drop it into your scene.
+- If you want to add the Suika/Melon game into your world, just drag&drop it into your scene.
+- If you want to have a scoreboard, drag&drop the "SharedScoreboard" prefab into the scene, then select the "ArcadeMelonGame" in the scene, and set the "Shared Scoreboard Prefab" field, currently the scoreboard doesn't work for the HeliCave game, but I am working on it. Multiple arcade machines can share the same scoreboard.
 - Done
 
 ### Adding multiple arcade machines
