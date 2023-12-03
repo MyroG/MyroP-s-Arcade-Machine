@@ -165,7 +165,7 @@ namespace myro.arcade
 		/// </summary>
 		public void PlayerPickedUpJoystick()
 		{
-			WaitMessage.SetActive(!Networking.IsOwner(gameObject));
+			WaitMessage.SetActive(!Networking.IsOwner(gameObject) && _gameState == GameState.PLAY);
 			if (_gameState == GameState.FINISH)
 			{
 				Networking.SetOwner(Networking.LocalPlayer, gameObject);
@@ -245,6 +245,19 @@ namespace myro.arcade
 
 			int numberOfSyncedFruits = _positionFruits.Length;
 
+			//first for-loop to check if all references are valid, this is to prevent possible errors
+			for (int i = _instantiatedFruits.Count - 1; i >= 0; i--)
+			{
+				//if (_instantiatedFruits[i].Error == DataError.None)
+				//{
+					Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
+					if (!Utilities.IsValid(fruit))
+					{
+						_instantiatedFruits.RemoveAt(i);
+					}
+				//}
+			}
+
 			if (_instantiatedFruits.Count < numberOfSyncedFruits)
 			{
 				//Here we need to instantiate more fruits
@@ -270,7 +283,6 @@ namespace myro.arcade
 				{
 					//Now we update each fruit
 					Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
-					fruit.gameObject.SetActive(true);
 					fruit.transform.localPosition = _positionFruits[i];
 					fruit.transform.localRotation = _rotationFruits[i];
 					fruit.SetRank(_rankFruits[i]);
