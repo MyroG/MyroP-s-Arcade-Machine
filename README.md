@@ -11,7 +11,8 @@ It currently features two games :
 
 ![Showcase](https://github.com/MyroG/MyroP-s-Arcade-Machine/blob/master/Doc/heli.gif)
 
-Both games are synced for remote players
+Both games are synced for remote players.
+
 The machine can be scaled up and down for smaller and bigger avatars.
 
 The latest version of the arcade machine can be tested here : https://vrchat.com/home/world/wrld_22e9b1a3-1d2e-4800-b46d-ce3501b07001
