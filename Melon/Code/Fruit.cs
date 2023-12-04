@@ -104,6 +104,9 @@ namespace myro.arcade
 
 		private void FixedUpdate()
 		{
+			if (!enabled)
+				return;
+
 			//Local velocity contraint
 			Vector3 localVelocity = transform.parent.InverseTransformDirection(RigidbodyInstance.velocity);
 			localVelocity.z = 0;

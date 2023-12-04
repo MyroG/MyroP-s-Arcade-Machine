@@ -88,6 +88,7 @@ namespace myro.arcade
 			short rank = UpdateNextFruitViewAndReturnCurrentRank();
 			_currentFruit = InstantiateNewFruitAt(rank, false);
 			_currentFruit.transform.localPosition = GetCursorPosition();
+			_currentFruit.enabled = false;
 		}
 
 
@@ -202,6 +203,7 @@ namespace myro.arcade
 			{
 				if (_currentFruit != null)
 				{
+					_currentFruit.enabled = true;
 					_currentFruit.DropFruit();
 					_currentFruit = null;
 					_combo = 0;
@@ -247,14 +249,11 @@ namespace myro.arcade
 			//first for-loop to check if all references are valid, this is to prevent possible errors
 			for (int i = _instantiatedFruits.Count - 1; i >= 0; i--)
 			{
-				//if (_instantiatedFruits[i].Error == DataError.None)
-				//{
-					Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
-					if (!Utilities.IsValid(fruit))
-					{
-						_instantiatedFruits.RemoveAt(i);
-					}
-				//}
+				Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
+				if (!Utilities.IsValid(fruit))
+				{
+					_instantiatedFruits.RemoveAt(i);
+				}
 			}
 
 			if (_instantiatedFruits.Count < numberOfSyncedFruits)
