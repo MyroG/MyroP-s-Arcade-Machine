@@ -23,7 +23,7 @@ namespace myro.arcade
 		public GameObject GameOverMessage;
 		public MelonGameSettings MelonGameSettingsInstance;
 		public TextMeshProUGUI Score;
-		public Image NextRankImage;
+		public MeshRenderer NextRankImage;
 		public GameObject WaitMessage;
 		public AudioSource Music;
 
@@ -53,7 +53,8 @@ namespace myro.arcade
 
 		void Start()
 		{
-			_gameState = GameState.FINISH;			
+			_gameState = GameState.FINISH;
+
 			GameOver();
 		}
 
@@ -296,7 +297,7 @@ namespace myro.arcade
 		private void UpdateNextRankImage()
 		{
 			SetTextureOffset(NextRankImage.material, _nextRank);
-			float scale = (_nextRank + 1) * 0.2f + 0.2f;
+			float scale = (_nextRank + 1) + 1.0f;
 			NextRankImage.transform.localScale = new Vector3(scale, scale, scale);
 		}
 
