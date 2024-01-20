@@ -32,13 +32,14 @@ Installation steps :
     - If you want to add the Melon game into your world, just drag&drop it into your scene.
     - If you want to have a scoreboard, drag&drop the "SharedScoreboard" prefab into the scene, then select the your acade machine in the scene, and set the "Shared Scoreboard Prefab" field. Multiple arcade machines can share the same scoreboard, but make sure to use a different scoreboard for two different game
 - make sure to read the next paragraph if you want to add multiple arcade machines in your world.
+- The spawn point should not be too close to the arcade machine!
 - Done
 
 ### Adding multiple arcade machines
 
 It is possible to add multiple arcade machines in the same world, but it's unfortunately not as straighforward as just copy/pasting the arcade machine.
 The arcade machine uses a Render texture to render the game, and render textures are unique for each camera, since each arcade machine has a separate camera the render texture needs to be duplicated :
-- In the folder `MyroP/Arcade/RenderTextures`, duplicate a Render texture.
+- In the folder `MyroP/Arcade/RenderTextures`, duplicate a Render texture. You can duplicate a render texture with the Ctrl+D shortcut, or in the Windows file explorer.
 - In the root prefab, drag&drop the render texture in the `Render texture to use` property field, see the next paragraph if you cannot find the setting.
 
 ### Settings

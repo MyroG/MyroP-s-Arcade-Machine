@@ -31,12 +31,17 @@ namespace myro.arcade
 			{
 				return;
 			}
-			if (transform.localPosition.y - transform.localScale.x / 2.0f  < _yAxisLimit)
+			if (transform.localPosition.y - transform.localScale.x / 2.0f  < _yAxisLimit 
+				|| RigidbodyInstance.velocity.magnitude > 0.5f * transform.lossyScale.x)
 			{
+				//everything is alright
 				_startTimeAboveLimit = 0;
 			}
-			else if (_startTimeAboveLimit == 0)
+			else if (_startTimeAboveLimit == 0 
+				&& transform.localPosition.y - transform.localScale.x / 2.0f >= _yAxisLimit 
+				&& RigidbodyInstance.velocity.magnitude <= 0.5f * transform.lossyScale.x)
 			{
+				//Dangerously close to a game over
 				_startTimeAboveLimit = Time.time;
 			}
 			else if (Time.time - _startTimeAboveLimit > 1.0f && _melonGameLoopInstance.GetGameState() != GameState.FINISH)

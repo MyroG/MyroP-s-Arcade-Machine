@@ -24,7 +24,6 @@ namespace myro.arcade
 		public MelonGameSettings MelonGameSettingsInstance;
 		public TextMeshProUGUI Score;
 		public MeshRenderer NextRankImage;
-		public GameObject WaitMessage;
 		public AudioSource Music;
 
 		private Fruit _currentFruit;
@@ -32,6 +31,9 @@ namespace myro.arcade
 
 		private const float SYNCING_RATE = 0.2f;
 		private int _combo;
+
+		[UdonSynced]
+		private bool _joystickGrabbed;
 
 		[UdonSynced]
 		private GameState _gameState;
@@ -100,8 +102,6 @@ namespace myro.arcade
 
 		private void StartGame()
 		{
-			WaitMessage.SetActive(false);
-
 			if (_instantiatedFruits != null)
 			{
 				for (int i = 0; i < _instantiatedFruits.Count; i++)
@@ -161,11 +161,19 @@ namespace myro.arcade
 		/// </summary>
 		public void PlayerPickedUpJoystick()
 		{
-			WaitMessage.SetActive(!Networking.IsOwner(gameObject) && _gameState == GameState.PLAY);
+			if (!Networking.IsOwner(gameObject))
+			{
+				Networking.SetOwner(Networking.LocalPlayer, gameObject);
+				StartGame();
+			}
+			_joystickGrabbed = true;
+			RequestSerialization();
+
+			/*WaitMessage.SetActive(!Networking.IsOwner(gameObject) && _gameState == GameState.PLAY);
 			if (_gameState == GameState.FINISH)
 			{
 				Networking.SetOwner(Networking.LocalPlayer, gameObject);
-			}
+			}*/
 		}
 
 		/// <summary>
@@ -173,7 +181,8 @@ namespace myro.arcade
 		/// </summary>
 		public void PlayerDroppedJoystick()
 		{
-			WaitMessage.SetActive(false);
+			_joystickGrabbed = false;
+			RequestSerialization();
 		}
 
 		bool _isPlayerInArea;
@@ -219,6 +228,9 @@ namespace myro.arcade
 
 		public void OnResetPressed()
 		{
+			if (_joystickGrabbed)
+				return;
+
 			if (!Networking.IsOwner(gameObject))
 				Networking.SetOwner(Networking.LocalPlayer, gameObject);
 
@@ -331,9 +343,7 @@ namespace myro.arcade
 			}
 			_gameState = GameState.FINISH;
 
-			WaitMessage.SetActive(false);
 			UpdateUI();
-
 
 			//pausing all physics
 			if (_instantiatedFruits != null)
