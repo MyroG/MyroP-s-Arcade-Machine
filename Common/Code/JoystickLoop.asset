@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: JoystickLoop
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: e00c108032d77c040924c4ecf4e2a793,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 1d24e6a67fdf5bbf693c8f1ef11c52d7, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: db4efb8cb41e0f848be5a7a0cc75f742, type: 3}

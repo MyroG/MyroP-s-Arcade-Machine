@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: HeliCaveGameSettings
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 0b6efb25960d92046a38242a2334f823,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 1e34793e601f8b97b960346159ded3cf, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 4f06ef35002d2714da4a1b2df97d4aff, type: 3}

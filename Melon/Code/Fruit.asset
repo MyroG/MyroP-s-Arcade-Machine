@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: Fruit
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 815d6ea5d0cd35e4fa867d3e1b1561d2,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 225a683b85d43c844bc8ddd1031516dd, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: f35b32852b537de4ba0292232fdca73a, type: 3}

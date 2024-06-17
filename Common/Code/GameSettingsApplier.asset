@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: GameSettingsApplier
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 554be7dfe854e1a4ba12e7c41e898a84,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 9d6f5d607001c29d7a1a6f465b291d01, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 2fd3ccb92bb180f468f8ac22bdd9ce53, type: 3}

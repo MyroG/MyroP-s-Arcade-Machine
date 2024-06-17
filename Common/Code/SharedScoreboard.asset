@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: SharedScoreboard
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: c722c5da366134947a5c8d546818cf8b,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 830b674d8cae71026829d914bcb01f7a, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: a65163c0895c3e04f8cf998c74729831, type: 3}

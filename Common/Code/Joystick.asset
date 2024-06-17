@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: Joystick
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 4ba50d1b02d37f64baaa92fef8e62c73,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: a83147dcdf16613cb804aeb523946e27, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 769d8d2dff6d6704f9122bdaf9dd4ef9, type: 3}

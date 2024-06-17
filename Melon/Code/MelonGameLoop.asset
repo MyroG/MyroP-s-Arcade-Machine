@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: MelonGameLoop
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: d0bc7d4653ea4f74d9114e5df8fa3eac,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: cdbf356c839990637bfe12c9e98c47b7, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 51ec9f3adf6c4ff4c8098c88f688acca, type: 3}
