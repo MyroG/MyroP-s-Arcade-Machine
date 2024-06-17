@@ -63,7 +63,7 @@ namespace myro.arcade
 		private short UpdateNextFruitViewAndReturnCurrentRank()
 		{
 			short newRank = _nextRank;
-			_nextRank = (short) Random.Range(0, 5);
+			_nextRank = (short)Random.Range(0, 5);
 
 			UpdateNextRankImage();
 
@@ -237,7 +237,7 @@ namespace myro.arcade
 			StartGame();
 		}
 
-		
+
 
 		// Here, OnDeserialization should only be called for the remote player
 		public override void OnDeserialization()
@@ -382,7 +382,7 @@ namespace myro.arcade
 			_instantiatedFruits.Remove(anotherFruit);
 			Destroy(anotherFruit.gameObject);
 		}
-		
+
 		private void Update()
 		{
 			if (_currentFruit != null)
@@ -399,6 +399,7 @@ namespace myro.arcade
 		#region Audio
 
 		public AudioSource AudioPlayer;
+		public AudioSource ComboPlayer;
 		public AudioClip Drop;
 		public AudioClip Collision;
 		public AudioClip Combo;
@@ -406,7 +407,7 @@ namespace myro.arcade
 		public void IncrementComboAndPlayAudio()
 		{
 			_combo++;
-			AudioPlayer.pitch = 1 + _combo / 6.0f;
+			ComboPlayer.pitch = 1 + _combo / 6.0f;
 			SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayComboAudio));
 		}
 
@@ -415,8 +416,7 @@ namespace myro.arcade
 			if (!_isPlayerInArea)
 				return;
 
-			AudioPlayer.clip = Combo;
-			AudioPlayer.Play();
+			ComboPlayer.PlayOneShot(Combo);
 		}
 
 		public void PlayCollisionAudio()
@@ -424,9 +424,7 @@ namespace myro.arcade
 			if (!_isPlayerInArea)
 				return;
 
-			AudioPlayer.pitch = 1;
-			AudioPlayer.clip = Collision;
-			AudioPlayer.Play();
+			AudioPlayer.PlayOneShot(Collision);
 		}
 
 		public void PlayDropAudio()
@@ -434,9 +432,7 @@ namespace myro.arcade
 			if (!_isPlayerInArea)
 				return;
 
-			AudioPlayer.pitch = 1;
-			AudioPlayer.clip = Drop;
-			AudioPlayer.Play();
+			AudioPlayer.PlayOneShot(Drop);
 		}
 		#endregion
 	}
