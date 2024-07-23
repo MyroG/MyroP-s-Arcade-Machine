@@ -13,6 +13,8 @@ namespace myro.arcade
 	{
 		public UdonSharpBehaviour MainGameInstance;
 		public GameObject HoloJoystick;
+
+		[Header("Left and right side of the screen, used to track the position of the joystick")]
 		public Transform LeftScreen;
 		public Transform RightScreen;
 		private VRCObjectSync _objectSync;
