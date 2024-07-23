@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: GameOverCollider
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 32f7b63c27527e2428b82f1482cc043e,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: d655df7d048c90d2c84e91875c475159, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: e636c2edb422a8146ae3fac62c9c549d, type: 3}

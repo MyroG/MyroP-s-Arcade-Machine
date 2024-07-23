@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: CameraScaleConstraint
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 731809b26ab319e43ae0548ad934d2e5,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 34ed1b418eba6b5a4a3b8a614394e83d, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 755dff9a1154b9e49969712038602a23, type: 3}
