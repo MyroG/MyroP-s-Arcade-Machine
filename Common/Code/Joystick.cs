@@ -1,5 +1,4 @@
-﻿
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
 using VRC.SDK3.Components;
 using VRC.SDKBase;
@@ -54,7 +53,7 @@ namespace myro.arcade
 			_joystickLoop.enabled = false;
 			MainGameInstance.SendCustomEvent("PlayerDroppedJoystick");
 			SendCustomNetworkEvent(NetworkEventTarget.All, nameof(OnDropEvent));
-			_objectSync.Respawn();
+			RespawnJoystick();
 		}
 
 		public void OnDropEvent()
@@ -84,6 +83,27 @@ namespace myro.arcade
 		{
 			CheckForInitialisation();
 			return _joystickLoop.GetRatio();
+		}
+
+		public void RespawnJoystick()
+		{
+			if (_objectSync != null)
+			{
+				_objectSync.Respawn();
+			}
+		}
+
+		public void RespawnJoystickIfNotHolding()
+		{
+			if (!_pickup.IsHeld)
+			{
+				RespawnJoystick();
+			}
+		}
+
+		public void RequestJoystickRespawn()
+		{
+			SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(RespawnJoystickIfNotHolding));
 		}
 	}
 }

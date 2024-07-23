@@ -75,11 +75,9 @@ namespace myro.arcade
 		public void SetRank(short rank)
 		{
 			_rank = rank;
-			//In the original game, I found that the container is 315px wide, a cherry 22px wide, and a melon 184px
-			//I am calculating the scale of each fruit based on their rank
 			float fruitScale = 0.22f + rank * 0.147272f;
-			transform.localScale = new Vector3(fruitScale, fruitScale, fruitScale);
-			RigidbodyInstance.mass = fruitScale * fruitScale * 3.1415926f;
+			transform.localScale = Vector3.one * fruitScale;
+			RigidbodyInstance.mass = 1;
 			_melonGameLoopInstance.SetTextureOffset(MeshRendererInstance.material, rank);
 		}
 

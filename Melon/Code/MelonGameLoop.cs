@@ -23,14 +23,23 @@ namespace myro.arcade
 		public GameObject GameOverMessage;
 		public MelonGameSettings MelonGameSettingsInstance;
 		public TextMeshProUGUI Score;
-		public Image NextRankImage;
-		public GameObject WaitMessage;
+		public MeshRenderer NextRankImage;
+		public AudioSource Music;
+
+		public AudioSource AudioPlayer;
+		public AudioSource ComboPlayer;
+		public AudioClip Drop;
+		public AudioClip Collision;
+		public AudioClip Combo;
 
 		private Fruit _currentFruit;
 		private DataList _instantiatedFruits;
 
 		private const float SYNCING_RATE = 0.2f;
 		private int _combo;
+
+		[UdonSynced]
+		private bool _joystickGrabbed;
 
 		[UdonSynced]
 		private GameState _gameState;
@@ -52,14 +61,14 @@ namespace myro.arcade
 
 		void Start()
 		{
-			_gameState = GameState.FINISH;			
+			_gameState = GameState.FINISH;
 			GameOver();
 		}
 
 		private short UpdateNextFruitViewAndReturnCurrentRank()
 		{
 			short newRank = _nextRank;
-			_nextRank = (short) Random.Range(0, 5);
+			_nextRank = (short)Random.Range(0, 5);
 
 			UpdateNextRankImage();
 
@@ -87,6 +96,7 @@ namespace myro.arcade
 			short rank = UpdateNextFruitViewAndReturnCurrentRank();
 			_currentFruit = InstantiateNewFruitAt(rank, false);
 			_currentFruit.transform.localPosition = GetCursorPosition();
+			_currentFruit.enabled = false;
 		}
 
 
@@ -97,8 +107,6 @@ namespace myro.arcade
 
 		private void StartGame()
 		{
-			WaitMessage.SetActive(false);
-
 			if (_instantiatedFruits != null)
 			{
 				for (int i = 0; i < _instantiatedFruits.Count; i++)
@@ -115,6 +123,7 @@ namespace myro.arcade
 			NewFruit();
 			SyncingLoop();
 			UpdateUIState();
+			Music.Play();
 		}
 
 		public void AddToScore(int points)
@@ -157,11 +166,19 @@ namespace myro.arcade
 		/// </summary>
 		public void PlayerPickedUpJoystick()
 		{
-			WaitMessage.SetActive(!Networking.IsOwner(gameObject) && _gameState == GameState.PLAY);
+			if (!Networking.IsOwner(gameObject))
+			{
+				Networking.SetOwner(Networking.LocalPlayer, gameObject);
+				StartGame();
+			}
+			_joystickGrabbed = true;
+			RequestSerialization();
+
+			/*WaitMessage.SetActive(!Networking.IsOwner(gameObject) && _gameState == GameState.PLAY);
 			if (_gameState == GameState.FINISH)
 			{
 				Networking.SetOwner(Networking.LocalPlayer, gameObject);
-			}
+			}*/
 		}
 
 		/// <summary>
@@ -169,7 +186,8 @@ namespace myro.arcade
 		/// </summary>
 		public void PlayerDroppedJoystick()
 		{
-			WaitMessage.SetActive(false);
+			_joystickGrabbed = false;
+			RequestSerialization();
 		}
 
 		bool _isPlayerInArea;
@@ -200,6 +218,7 @@ namespace myro.arcade
 			{
 				if (_currentFruit != null)
 				{
+					_currentFruit.enabled = true;
 					_currentFruit.DropFruit();
 					_currentFruit = null;
 					_combo = 0;
@@ -214,19 +233,27 @@ namespace myro.arcade
 
 		public void OnResetPressed()
 		{
+			if (_joystickGrabbed)
+				return;
+
 			if (!Networking.IsOwner(gameObject))
 				Networking.SetOwner(Networking.LocalPlayer, gameObject);
 
 			StartGame();
 		}
 
-		
+
 
 		// Here, OnDeserialization should only be called for the remote player
 		public override void OnDeserialization()
 		{
 			if (!_isPlayerInArea)
 				return;
+
+			if (_gameState == GameState.PLAY && !Music.isPlaying)
+				Music.Play();
+			else if (_gameState == GameState.FINISH && Music.isPlaying)
+				Music.Stop();
 
 			UpdateUI();
 
@@ -240,14 +267,11 @@ namespace myro.arcade
 			//first for-loop to check if all references are valid, this is to prevent possible errors
 			for (int i = _instantiatedFruits.Count - 1; i >= 0; i--)
 			{
-				//if (_instantiatedFruits[i].Error == DataError.None)
-				//{
-					Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
-					if (!Utilities.IsValid(fruit))
-					{
-						_instantiatedFruits.RemoveAt(i);
-					}
-				//}
+				Fruit fruit = (Fruit)_instantiatedFruits[i].Reference;
+				if (!Utilities.IsValid(fruit))
+				{
+					_instantiatedFruits.RemoveAt(i);
+				}
 			}
 
 			if (_instantiatedFruits.Count < numberOfSyncedFruits)
@@ -290,7 +314,7 @@ namespace myro.arcade
 		private void UpdateNextRankImage()
 		{
 			SetTextureOffset(NextRankImage.material, _nextRank);
-			float scale = (_nextRank + 1) * 0.2f + 0.2f;
+			float scale = (_nextRank + 1) + 1.0f;
 			NextRankImage.transform.localScale = new Vector3(scale, scale, scale);
 		}
 
@@ -315,6 +339,8 @@ namespace myro.arcade
 
 		public void GameOver()
 		{
+			Music.Stop();
+
 			if (_currentFruit != null)
 			{
 				Destroy(_currentFruit.gameObject);
@@ -322,9 +348,9 @@ namespace myro.arcade
 			}
 			_gameState = GameState.FINISH;
 
-			WaitMessage.SetActive(false);
 			UpdateUI();
 
+			//pausing all physics
 			if (_instantiatedFruits != null)
 			{
 				for (int i = 0; i < _instantiatedFruits.Count; i++)
@@ -339,7 +365,7 @@ namespace myro.arcade
 				}
 			}
 
-			if (_score > 32)
+			if (_score > 32 && MelonGameSettingsInstance.SharedScoreboardPrefab)
 			{
 				MelonGameSettingsInstance.SharedScoreboardPrefab.Insert(Networking.LocalPlayer, _score);
 			}
@@ -361,7 +387,7 @@ namespace myro.arcade
 			_instantiatedFruits.Remove(anotherFruit);
 			Destroy(anotherFruit.gameObject);
 		}
-		
+
 		private void Update()
 		{
 			if (_currentFruit != null)
@@ -377,15 +403,10 @@ namespace myro.arcade
 
 		#region Audio
 
-		public AudioSource AudioPlayer;
-		public AudioClip Drop;
-		public AudioClip Collision;
-		public AudioClip Combo;
-
 		public void IncrementComboAndPlayAudio()
 		{
 			_combo++;
-			AudioPlayer.pitch = 1 + _combo / 6.0f;
+			ComboPlayer.pitch = 1 + _combo / 6.0f;
 			SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayComboAudio));
 		}
 
@@ -394,8 +415,7 @@ namespace myro.arcade
 			if (!_isPlayerInArea)
 				return;
 
-			AudioPlayer.clip = Combo;
-			AudioPlayer.Play();
+			ComboPlayer.PlayOneShot(Combo);
 		}
 
 		public void PlayCollisionAudio()
@@ -403,9 +423,7 @@ namespace myro.arcade
 			if (!_isPlayerInArea)
 				return;
 
-			AudioPlayer.pitch = 1;
-			AudioPlayer.clip = Collision;
-			AudioPlayer.Play();
+			AudioPlayer.PlayOneShot(Collision);
 		}
 
 		public void PlayDropAudio()
@@ -413,9 +431,7 @@ namespace myro.arcade
 			if (!_isPlayerInArea)
 				return;
 
-			AudioPlayer.pitch = 1;
-			AudioPlayer.clip = Drop;
-			AudioPlayer.Play();
+			AudioPlayer.PlayOneShot(Drop);
 		}
 		#endregion
 	}

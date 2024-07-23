@@ -11,6 +11,7 @@ namespace myro.arcade
 	public class Button : UdonSharpBehaviour
 	{
 		public UdonSharpBehaviour MainGameInstance;
+		public Joystick JoystickMesh;
 		public string EventName;
 
 		void Start()
@@ -21,6 +22,7 @@ namespace myro.arcade
 		public override void Interact()
 		{
 			MainGameInstance.SendCustomEvent(EventName);
+			JoystickMesh.RequestJoystickRespawn();
 		}
 	}
 }
